@@ -214,7 +214,9 @@ function parseAnalysisResults(content) {
 
 function displayResults(results) {
   elements.results.innerHTML = "";
+  console.log("Results : ", results);
   results.forEach((result, index) => {
+    console.log("Result : ", result);
     if (result && Object.keys(result).length > 0) {
       const presence = result.present.toLowerCase().includes("yes");
       const confidence = parseInt(result.confidence) || 0;
