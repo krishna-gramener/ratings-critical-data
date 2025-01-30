@@ -151,7 +151,53 @@ async function analyzeDocument(textWithPages) {
           system_instruction: {
             parts: [
               {
-                text: "You are an ESG analysis expert. Provide detailed, evidence-based analysis in the exact structured format requested.",
+                text: `You are an ESG analysis expert. Provide detailed, evidence-based analysis in JSON format.
+Your response must strictly follow this JSON schema:
+{
+  "type": "object",
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "indicator": {
+            "type": "string",
+            "description": "The name of the ESG indicator." ${Object.keys(indicators)
+              .map((indicator) => `"${indicator}"`)
+              .join(", ")}
+          },
+          "present": {
+            "type": "string",
+            "enum": ["Yes", "No"],
+            "description": "Indicates whether the indicator is present or not."
+          },
+          "confidence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "A confidence level indicating the degree of certainty about the presence of the indicator."
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Direct quotes with Page Number that provide evidence for the indicator's presence."
+          },
+          "comments": {
+            "type": "string",
+            "description": "Additional context or analysis regarding the indicator."
+          },
+          "conclusion": {
+            "type": "string",
+            "description": "The conclusion regarding the indicator's involvement, with options from ${JSON.stringify(indicators)} for each indicator, 'No Value' if not involved."
+          }
+        },
+        "required": ["indicator", "present", "confidence", "evidence", "comments", "conclusion"]
+      }
+    }
+  }
+}
+
+Return ONLY valid JSON that matches this schema exactly. Do not include any other text or explanation.`,
               },
             ],
           },
@@ -160,7 +206,7 @@ async function analyzeDocument(textWithPages) {
               role: "user",
               parts: [
                 {
-                  text: prompt + "\n\nText to analyze:\n" + text,
+                  text: "Text to analyze:\n" + text,
                 },
               ],
             },
@@ -170,10 +216,38 @@ async function analyzeDocument(textWithPages) {
     );
 
     const data = await response.json();
-    console.log("Data : ", data);
+    // console.log("Data : ", data);
     if (data.error) throw new Error(data.error.message);
-    // console.log(data.choices[0].message.content);
-    return parseAnalysisResults(data.candidates[0].content.parts[0].text);
+    
+    try {
+      // Get the raw response text
+      let responseText = data.candidates[0].content.parts[0].text;
+      // console.log("Response Text : ", responseText);
+      
+      // Clean the response text more thoroughly
+      responseText = responseText
+        // Remove markdown code block
+        .replace(/```json\n?|\n?```/g, '')
+        // Remove any quotes around the entire JSON string
+        .replace(/^["']|["']$/g, '')
+        // Remove any extra whitespace at start and end
+        .trim();
+        
+      // console.log("Cleaned Response Text : ", responseText);
+      
+      // Parse the cleaned JSON response
+      const llmResponse = JSON.parse(responseText);
+      // console.log("LLM Response : ", llmResponse);
+      
+      if (!llmResponse.results || !Array.isArray(llmResponse.results)) {
+        throw new Error("Invalid response format: missing results array");
+      }
+      return llmResponse.results;
+    } catch (parseError) {
+      console.error("Failed to parse LLM response as JSON:", parseError);
+      // Fallback to text parsing if JSON parsing fails
+      return parseAnalysisResults(data.candidates[0].content.parts[0].text);
+    }
   } catch (error) {
     throw new Error(`Analysis failed: ${error.message}`);
   }
@@ -214,9 +288,9 @@ function parseAnalysisResults(content) {
 
 function displayResults(results) {
   elements.results.innerHTML = "";
-  console.log("Results : ", results);
+  // console.log("Results : ", results);
   results.forEach((result, index) => {
-    console.log("Result : ", result);
+    // console.log("Result : ", result);
     if (result && Object.keys(result).length > 0) {
       const presence = result.present.toLowerCase().includes("yes");
       const confidence = parseInt(result.confidence) || 0;
@@ -293,7 +367,7 @@ elements.analyzeBtn.addEventListener("click", async () => {
     }
 
     const analysis = await analyzeDocument(textWithPages);
-    console.log("Analysis : ", analysis);
+    // console.log("Analysis : ", analysis);
     displayResults(analysis);
   } catch (error) {
     console.error("Error : ", error);
