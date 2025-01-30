@@ -1,6 +1,7 @@
 import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4/+esm";
 pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4/build/pdf.worker.min.mjs";
 
+const { token } = await fetch("https://llmfoundry.straive.com/token", { credentials: "include" }).then((r) => r.json());
 const indicators = {
   "Employee Turnover": [
     "Overall assessment as Above industry average, increasing trend",
@@ -137,34 +138,49 @@ async function analyzeDocument(textWithPages) {
   try {
     const text = textWithPages.map((p) => `[Page ${p.page}] ${p.text}`).join("\n");
 
-    const response = await fetch("https://llmfoundry.straive.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an ESG analysis expert. Provide detailed, evidence-based analysis in the exact structured format requested.",
+    const response = await fetch(
+      "https://llmfoundry.straive.com/gemini/v1beta/models/gemini-1.5-flash-latest:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [
+              {
+                text: "You are an ESG analysis expert. Provide detailed, evidence-based analysis in the exact structured format requested.",
+              },
+            ],
           },
-          { role: "user", content: prompt + "\n\nText to analyze:\n" + text },
-        ],
-      }),
-    });
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: prompt + "\n\nText to analyze:\n" + text,
+                },
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
     const data = await response.json();
+    console.log("Data : ", data);
     if (data.error) throw new Error(data.error.message);
     // console.log(data.choices[0].message.content);
-    return parseAnalysisResults(data.choices[0].message.content);
+    return parseAnalysisResults(data.candidates[0].content.parts[0].text);
   } catch (error) {
     throw new Error(`Analysis failed: ${error.message}`);
   }
 }
 
 function parseAnalysisResults(content) {
-    // console.log("Content : ", content);
+  // console.log("Content : ", content);
   const sections = content
     .split("---")
     .map((s) => s.trim())
@@ -275,6 +291,7 @@ elements.analyzeBtn.addEventListener("click", async () => {
     }
 
     const analysis = await analyzeDocument(textWithPages);
+    console.log("Analysis : ", analysis);
     displayResults(analysis);
   } catch (error) {
     console.error("Error : ", error);
@@ -284,85 +301,3 @@ elements.analyzeBtn.addEventListener("click", async () => {
     elements.loadingSpinner.classList.add("d-none");
   }
 });
-
-async function getBase64FromPdf(url) {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } catch (error) {
-      throw new Error(`Failed to convert PDF to base64: ${error.message}`);
-    }
-  }
-
-async function extractTextUsingGemini(base64Pdf) {
-    try {
-      const response = await fetch(
-        "https://llmfoundry.straive.com/gemini/v1beta/models/gemini-1.5-flash-latest:generateContent",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            system_instruction: {
-              parts: [
-                {
-                  text: `Extract and return only the text content from the provided PDF.
-                  Data Should be in following format :-
-                  {
-                  Complete Extracted Text,
-                  Creditor,
-  Borrower,
-  Account Number,
-  Annual Percentage Rate (APR),
-  Finance Charge,
-  Amount Financed,
-  Total of Payments,
-  Monthly Payment Amount,
-  Number of Payments,
-  Returned Payment Fee,
-  Origination Fee,
-  Late Charges,
-                }
-  return in json format only.
-                  `,
-                },
-              ],
-            },
-            contents: [
-              {
-                role: "user",
-                parts: [
-                  { text: "This is a PDF document for text extraction." }, // Added the `text` field to describe the PDF
-                  {
-                    inline_data: {
-                      mime_type: "application/pdf",
-                      data: base64Pdf.split(",")[1], // Base64 content excluding the prefix
-                    },
-                  },
-                ],
-              },
-            ],
-          }),
-        }
-      );
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || `Unexpected error: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    } catch (error) {
-      throw new Error(`Gemini API error: ${error.message}`);
-    }
-  }
