@@ -185,7 +185,6 @@ async function extractText(file) {
 }
 
 async function analyzeDocument(textWithPages) {
-  //console.log("Indicators : ",JSON.stringify(indicators));
   const prompt = `Analyze the following text and extract information about these ESG indicators: ${Object.keys(
     indicators
   ).join(", ")}.
@@ -284,14 +283,11 @@ Return ONLY valid JSON that matches this schema exactly. Do not include any othe
     );
 
     const data = await response.json();
-    // console.log("Data : ", data);
     if (data.error) throw new Error(data.error.message);
     
     try {
       // Get the raw response text
       let responseText = data.candidates[0].content.parts[0].text;
-      // console.log("Response Text : ", responseText);
-      
       // Clean the response text more thoroughly
       responseText = responseText
         // Remove markdown code block
@@ -300,12 +296,9 @@ Return ONLY valid JSON that matches this schema exactly. Do not include any othe
         .replace(/^["']|["']$/g, '')
         // Remove any extra whitespace at start and end
         .trim();
-        
-      // console.log("Cleaned Response Text : ", responseText);
       
       // Parse the cleaned JSON response
       const llmResponse = JSON.parse(responseText);
-      // console.log("LLM Response : ", llmResponse);
       
       if (!llmResponse.results || !Array.isArray(llmResponse.results)) {
         throw new Error("Invalid response format: missing results array");
@@ -322,7 +315,6 @@ Return ONLY valid JSON that matches this schema exactly. Do not include any othe
 }
 
 function parseAnalysisResults(content) {
-  // console.log("Content : ", content);
   const sections = content
     .split("---")
     .map((s) => s.trim())
@@ -336,7 +328,6 @@ function parseAnalysisResults(content) {
         const [key, ...value] = line.split(":");
         // Trim and clean up the key and value
         const cleanedKey = key.replace(/[\*\s]+/g, "").toLowerCase();
-        // console.log("Cleaned Key : ", cleanedKey);
         const cleanedValue = value
           .join(":")
           .trim()
@@ -356,9 +347,7 @@ function parseAnalysisResults(content) {
 
 function displayResults(results) {
   elements.results.innerHTML = "";
-  // console.log("Results : ", results);
   results.forEach((result, index) => {
-    // console.log("Result : ", result);
     if (result && Object.keys(result).length > 0) {
       const presence = result.present.toLowerCase().includes("yes");
       const confidence = parseInt(result.confidence) || 0;
@@ -446,7 +435,6 @@ elements.analyzeBtn.addEventListener("click", async () => {
     }
 
     const analysis = await analyzeDocument(textWithPages);
-    // console.log("Analysis : ", analysis);
     displayResults(analysis);
   } catch (error) {
     console.error("Error : ", error);
