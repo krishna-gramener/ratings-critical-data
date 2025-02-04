@@ -2,6 +2,7 @@ import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4/+esm";
 pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4/build/pdf.worker.min.mjs";
 
 const { token } = await fetch("https://llmfoundry.straive.com/token", { credentials: "include" }).then((r) => r.json());
+const $dropdown = document.getElementById("dropdown");
 const indicators = {
   "Employee Turnover": [
     "Overall assessment as Above industry average, increasing trend",
@@ -97,6 +98,73 @@ const elements = {
   errorAlert: document.getElementById("errorAlert"),
   results: document.getElementById("results"),
 };
+
+// Create and append dropdowns
+const dropdownContainer = document.createElement('div');
+dropdownContainer.className = 'container mb-3';
+dropdownContainer.style.marginTop = '20px';
+
+// Create row for grid system
+const row = document.createElement('div');
+row.className = 'row';
+
+// Create columns for each dropdown
+const col1 = document.createElement('div');
+col1.className = 'col-md-6';
+const col2 = document.createElement('div');
+col2.className = 'col-md-6';
+
+// Create indicator keys dropdown
+const indicatorSelect = document.createElement('select');
+indicatorSelect.className = 'form-select';
+Object.keys(indicators).forEach(key => {
+  const option = document.createElement('option');
+  option.value = key;
+  option.textContent = key;
+  indicatorSelect.appendChild(option);
+});
+
+// Create values dropdown
+const valueSelect = document.createElement('select');
+valueSelect.className = 'form-select';
+
+// Add labels for dropdowns
+const label1 = document.createElement('label');
+label1.className = 'form-label';
+label1.textContent = 'View Indicator';
+const label2 = document.createElement('label');
+label2.className = 'form-label';
+label2.textContent = 'View Value';
+
+// Update values dropdown based on selected indicator
+function updateValueDropdown() {
+  const selectedIndicator = indicatorSelect.value;
+  valueSelect.innerHTML = '';
+  indicators[selectedIndicator].forEach(value => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = value;
+    valueSelect.appendChild(option);
+  });
+}
+
+// Initial population of values dropdown
+updateValueDropdown();
+
+// Add event listener for indicator change
+indicatorSelect.addEventListener('change', updateValueDropdown);
+
+// Assemble the grid structure
+col1.appendChild(label1);
+col1.appendChild(indicatorSelect);
+col2.appendChild(label2);
+col2.appendChild(valueSelect);
+row.appendChild(col1);
+row.appendChild(col2);
+dropdownContainer.appendChild(row);
+
+// Insert dropdowns into the dropdown div
+$dropdown.appendChild(dropdownContainer);
 
 async function extractText(file) {
   try {
@@ -294,7 +362,7 @@ function displayResults(results) {
     if (result && Object.keys(result).length > 0) {
       const presence = result.present.toLowerCase().includes("yes");
       const confidence = parseInt(result.confidence) || 0;
-
+      $dropdown.classList.remove("d-none");
       const card = document.createElement("div");
       card.className = "accordion-item";
       card.innerHTML = `
@@ -342,6 +410,17 @@ function displayResults(results) {
                         </div>
                     </div>
                 `;
+
+      // Add click event listener to update dropdowns
+      const button = card.querySelector('.accordion-button');
+      button.addEventListener('click', () => {
+        // Update indicator dropdown
+        indicatorSelect.value = result.indicator;
+        // Update value dropdown and select the conclusion
+        updateValueDropdown();
+        valueSelect.value = result.conclusion;
+      });
+
       elements.results.appendChild(card);
     }
   });
