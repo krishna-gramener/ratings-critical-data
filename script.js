@@ -3,6 +3,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4
 
 const { token } = await fetch("https://llmfoundry.straive.com/token", { credentials: "include" }).then((r) => r.json());
 const $dropdown = document.getElementById("dropdown");
+const $goldenSetDiv = document.getElementById("goldenSetDiv");
+const $csvUpload = document.getElementById("csvUpload");
 const indicators = {
   "Employee Turnover": [
     "Overall assessment as Above industry average, increasing trend",
@@ -90,6 +92,8 @@ const indicators = {
   ],
 };
 
+let pdfName="";
+let analysis="";
 const elements = {
   urlInput: document.getElementById("urlInput"),
   fileInput: document.getElementById("fileInput"),
@@ -100,48 +104,48 @@ const elements = {
 };
 
 // Create and append dropdowns
-const dropdownContainer = document.createElement('div');
-dropdownContainer.className = 'container mb-3';
-dropdownContainer.style.marginTop = '20px';
+const dropdownContainer = document.createElement("div");
+dropdownContainer.className = "container mb-3";
+dropdownContainer.style.marginTop = "20px";
 
 // Create row for grid system
-const row = document.createElement('div');
-row.className = 'row';
+const row = document.createElement("div");
+row.className = "row";
 
 // Create columns for each dropdown
-const col1 = document.createElement('div');
-col1.className = 'col-md-6';
-const col2 = document.createElement('div');
-col2.className = 'col-md-6';
+const col1 = document.createElement("div");
+col1.className = "col-md-6";
+const col2 = document.createElement("div");
+col2.className = "col-md-6";
 
 // Create indicator keys dropdown
-const indicatorSelect = document.createElement('select');
-indicatorSelect.className = 'form-select';
-Object.keys(indicators).forEach(key => {
-  const option = document.createElement('option');
+const indicatorSelect = document.createElement("select");
+indicatorSelect.className = "form-select";
+Object.keys(indicators).forEach((key) => {
+  const option = document.createElement("option");
   option.value = key;
   option.textContent = key;
   indicatorSelect.appendChild(option);
 });
 
 // Create values dropdown
-const valueSelect = document.createElement('select');
-valueSelect.className = 'form-select';
+const valueSelect = document.createElement("select");
+valueSelect.className = "form-select";
 
 // Add labels for dropdowns
-const label1 = document.createElement('label');
-label1.className = 'form-label';
-label1.textContent = 'View Indicator';
-const label2 = document.createElement('label');
-label2.className = 'form-label';
-label2.textContent = 'View Value';
+const label1 = document.createElement("label");
+label1.className = "form-label";
+label1.textContent = "View Indicator";
+const label2 = document.createElement("label");
+label2.className = "form-label";
+label2.textContent = "View Value";
 
 // Update values dropdown based on selected indicator
 function updateValueDropdown() {
   const selectedIndicator = indicatorSelect.value;
-  valueSelect.innerHTML = '';
-  indicators[selectedIndicator].forEach(value => {
-    const option = document.createElement('option');
+  valueSelect.innerHTML = "";
+  indicators[selectedIndicator].forEach((value) => {
+    const option = document.createElement("option");
     option.value = value;
     option.textContent = value;
     valueSelect.appendChild(option);
@@ -152,7 +156,7 @@ function updateValueDropdown() {
 updateValueDropdown();
 
 // Add event listener for indicator change
-indicatorSelect.addEventListener('change', updateValueDropdown);
+indicatorSelect.addEventListener("change", updateValueDropdown);
 
 // Assemble the grid structure
 col1.appendChild(label1);
@@ -185,23 +189,6 @@ async function extractText(file) {
 }
 
 async function analyzeDocument(textWithPages) {
-  const prompt = `Analyze the following text and extract information about these ESG indicators: ${Object.keys(
-    indicators
-  ).join(", ")}.
-
-  For each indicator, provide the following in a structured format:
-
-  Indicator: [Name]
-  Present: [Yes/No]
-  Confidence: [0-100]
-  Evidence: [Direct quotes with page numbers]
-  Comments: [Additional context or analysis]
-  Conclusion: [each key in ${JSON.stringify(
-    indicators
-  )} is an indicator. Choose one value from its corresponding array of values which best describes the company's involvement in the indicator. If the company is not involved in the indicator, choose "No Value".]
-
-  Separate each indicator with ---`;
-
   try {
     const text = textWithPages.map((p) => `[Page ${p.page}] ${p.text}`).join("\n");
 
@@ -255,7 +242,9 @@ Your response must strictly follow this JSON schema:
           },
           "conclusion": {
             "type": "string",
-            "description": "The conclusion regarding the indicator's involvement, with options from ${JSON.stringify(indicators)} for each indicator, 'No Value' if not involved."
+            "description": "The conclusion regarding the indicator's involvement, with options from ${JSON.stringify(
+              indicators
+            )} for each indicator, 'No Value' if not involved."
           }
         },
         "required": ["indicator", "present", "confidence", "evidence", "comments", "conclusion"]
@@ -284,22 +273,22 @@ Return ONLY valid JSON that matches this schema exactly. Do not include any othe
 
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-    
+
     try {
       // Get the raw response text
       let responseText = data.candidates[0].content.parts[0].text;
       // Clean the response text more thoroughly
       responseText = responseText
         // Remove markdown code block
-        .replace(/```json\n?|\n?```/g, '')
+        .replace(/```json\n?|\n?```/g, "")
         // Remove any quotes around the entire JSON string
-        .replace(/^["']|["']$/g, '')
+        .replace(/^["']|["']$/g, "")
         // Remove any extra whitespace at start and end
         .trim();
-      
+
       // Parse the cleaned JSON response
       const llmResponse = JSON.parse(responseText);
-      
+
       if (!llmResponse.results || !Array.isArray(llmResponse.results)) {
         throw new Error("Invalid response format: missing results array");
       }
@@ -401,8 +390,8 @@ function displayResults(results) {
                 `;
 
       // Add click event listener to update dropdowns
-      const button = card.querySelector('.accordion-button');
-      button.addEventListener('click', () => {
+      const button = card.querySelector(".accordion-button");
+      button.addEventListener("click", () => {
         // Update indicator dropdown
         indicatorSelect.value = result.indicator;
         // Update value dropdown and select the conclusion
@@ -411,8 +400,25 @@ function displayResults(results) {
       });
 
       elements.results.appendChild(card);
+      $goldenSetDiv.classList.remove("d-none");
     }
   });
+}
+
+function resetUI() {
+  // Reset the results
+  document.getElementById("results").innerHTML = '';
+  document.getElementById("goldenSetResults").innerHTML = '';
+  
+  // Reset file inputs
+  document.getElementById("csvUpload").value = '';
+  
+  // Reset the golden set div visibility
+  document.getElementById("goldenSetDiv").classList.add("d-none");
+  
+  // Clear any error messages
+  document.getElementById("errorAlert").classList.add("d-none");
+  document.getElementById("errorAlert").textContent = '';
 }
 
 elements.analyzeBtn.addEventListener("click", async () => {
@@ -429,12 +435,13 @@ elements.analyzeBtn.addEventListener("click", async () => {
       const text = await response.text();
       textWithPages = [{ page: 1, text }];
     } else if (elements.fileInput.files[0]) {
+      pdfName=elements.fileInput.files[0].name;
       textWithPages = await extractText(elements.fileInput.files[0]);
     } else {
       throw new Error("Please provide a URL or upload a PDF file");
     }
 
-    const analysis = await analyzeDocument(textWithPages);
+    analysis = await analyzeDocument(textWithPages);
     displayResults(analysis);
   } catch (error) {
     console.error("Error : ", error);
@@ -444,3 +451,297 @@ elements.analyzeBtn.addEventListener("click", async () => {
     elements.loadingSpinner.classList.add("d-none");
   }
 });
+
+elements.fileInput.addEventListener("change", async (e) => {
+  try {
+    resetUI(); // Reset everything when new file is selected
+    elements.loadingSpinner.classList.remove("d-none");
+    elements.results.innerHTML = "";
+    elements.errorAlert.classList.add("d-none");
+
+    let textWithPages = [];
+
+    if (elements.urlInput.value) {
+      const response = await fetch(elements.urlInput.value);
+      const text = await response.text();
+      textWithPages = [{ page: 1, text }];
+    } else if (elements.fileInput.files[0]) {
+      pdfName=elements.fileInput.files[0].name;
+      textWithPages = await extractText(elements.fileInput.files[0]);
+    } else {
+      throw new Error("Please provide a URL or upload a PDF file");
+    }
+
+    analysis = await analyzeDocument(textWithPages);
+    displayResults(analysis);
+  } catch (error) {
+    console.error("Error : ", error);
+    elements.errorAlert.textContent = error.message;
+    elements.errorAlert.classList.remove("d-none");
+  } finally {
+    elements.loadingSpinner.classList.add("d-none");
+  }
+});
+
+$csvUpload.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  // Add validation to check if file exists
+  if (!file) {
+    console.error('No file selected');
+    return;
+  }
+
+  // Add validation to check if it's a CSV file
+  if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+    console.error('Please select a valid CSV file');
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = (e) => {
+    const text = e.target.result;
+    processCSVData(text);
+  };
+
+  reader.onerror = (error) => {
+    console.error('Error reading file:', error);
+  };
+
+  try {
+    reader.readAsText(file);
+  } catch (error) {
+    console.error('Error reading file:', error);
+  }
+});
+
+function processCSVData(csvText) {
+  // Parse CSV properly handling quoted fields and special characters
+  const parseCSV = (text) => {
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      
+      if (char === '"') {
+        if (inQuotes && text[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        row.push(field.trim());
+        field = '';
+      } else if ((char === '\n' || char === '\r') && !inQuotes) {
+        if (field || row.length > 0) {
+          row.push(field.trim());
+          if (row.length > 0) {  // Only add non-empty rows
+            rows.push(row);
+          }
+          row = [];
+          field = '';
+        }
+      } else {
+        field += char;
+      }
+    }
+    
+    // Handle last field and row
+    if (field || row.length > 0) {
+      row.push(field.trim());
+      rows.push(row);
+    }
+    
+    return rows;
+  };
+
+  const rows = parseCSV(csvText);
+  
+  const headers = rows[0].map(h => h.toLowerCase().trim());
+
+  // Find required column indices
+  const nameIndex = headers.findIndex((h) => h === "name");
+  const dpNameIndex = headers.findIndex((h) => h === "dp name");
+  const correctAnswerIndex = headers.findIndex((h) => h === "correct answer");
+
+  if (nameIndex === -1 || dpNameIndex === -1 || correctAnswerIndex === -1) {
+    alert("Required columns not found in CSV. Please ensure CSV has 'Name', 'DP Name' and 'Correct Answer' columns.");
+    return;
+  }
+
+  // Convert to array of objects with required fields
+  const csvData = rows
+    .slice(1)
+    .map((row) => ({
+      name: row[nameIndex]?.trim().toLowerCase(),
+      dpName: row[dpNameIndex]?.trim().toLowerCase(),
+      correctAnswer: row[correctAnswerIndex]?.trim().toLowerCase(),
+    }))
+    .filter((row) => row.name && row.dpName && row.correctAnswer);
+
+  // Get the current PDF name from the dropdown
+  const currentPDF = pdfName.trim().toLowerCase();
+
+  // Filter CSV data for current PDF
+  const relevantData = csvData.filter((row) => row.name === currentPDF);
+
+  // Compare with LLM outputs
+  const results = compareWithLLMOutput(relevantData);
+
+  // Display results
+  displayAccuracyResults(results);
+}
+
+function compareWithLLMOutput(csvData) {
+  const matches = [];
+  let correctCount = 0;
+  const totalIndicators = Object.keys(indicators).length;
+  // Function to normalize string (lowercase, trim, replace multiple spaces)
+  const normalizeString = (str) => {
+    return str?.toLowerCase().trim().replace(/\s+/g, ' ') || '';
+  };
+
+  // Compare each indicator with CSV data
+  for (const indicator of Object.keys(indicators)) {
+
+    // Find matching analysis object for this indicator
+    const analysisEntry = analysis.find(item => item.indicator === indicator);
+    const llmConclusion = normalizeString(analysisEntry?.conclusion);
+
+    // Find matching CSV entry using find method
+    const csvEntry = csvData.find(row => row.dpName.toLowerCase() === indicator.toLowerCase());
+    const csvConclusion = normalizeString(csvEntry?.correctAnswer);
+
+    if (!csvConclusion) {
+      correctCount++;
+      matches.push({
+        indicator,
+        llmOutput: analysisEntry?.conclusion || 'N/A',
+        csvOutput: "Not present in CSV",
+        isCorrect: true,
+      });
+      continue;
+    }
+
+    // Compare normalized strings
+    const isCorrect = llmConclusion === csvConclusion;
+    if (isCorrect) correctCount++;
+
+    matches.push({
+      indicator,
+      llmOutput: analysisEntry?.conclusion || 'N/A',
+      csvOutput: csvEntry?.correctAnswer || 'N/A',
+      isCorrect,
+    });
+  }
+
+  const accuracy = (correctCount / totalIndicators) * 100;
+
+  // Display results in table format
+  const resultsDiv = document.getElementById("goldenSetResults");
+  
+  let html = `
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title ${accuracy >= 80 ? 'text-success' : accuracy >= 40 ? 'text-warning' : 'text-danger'}">
+          Accuracy: ${accuracy.toFixed(2)}%
+        </h4>
+        <p class="card-text">Correct matches: ${correctCount}/${totalIndicators}</p>
+        
+        <div class="table-responsive mt-3">
+          <table class="table table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Indicator</th>
+                <th>LLM Conclusion</th>
+                <th>Golden Set Answer</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+  `;
+
+  // Add rows for each comparison
+  matches.forEach(match => {
+    html += `
+      <tr>
+        <td>${match.indicator}</td>
+        <td>${match.llmOutput}</td>
+        <td>${match.csvOutput}</td>
+        <td class="${match.isCorrect ? 'text-success' : 'text-danger'}">
+          ${match.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+        </td>
+      </tr>
+    `;
+  });
+
+  html += `
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  resultsDiv.innerHTML = html;
+
+  return {
+    matches,
+    accuracy,
+    correctCount,
+    total: totalIndicators,
+  };
+}
+
+function displayAccuracyResults(results) {
+  const resultsDiv = document.getElementById("goldenSetResults");
+
+  // Determine color based on accuracy
+  let colorClass;
+  if (results.accuracy >= 80) {
+    colorClass = "text-success";
+  } else if (results.accuracy >= 40) {
+    colorClass = "text-warning";
+  } else {
+    colorClass = "text-danger";
+  }
+
+  // Create results HTML
+  let html = `
+      <h4 class="${colorClass}">Accuracy: ${results.accuracy.toFixed(2)}%</h4>
+      <p>Correct matches: ${results.correctCount}/${results.total}</p>
+      <div class="mt-3">
+          <h5>Detailed Results:</h5>
+          <div class="table-responsive">
+              <table class="table table-bordered">
+                  <thead>
+                      <tr>
+                          <th>Indicator</th>
+                          <th>LLM Output</th>
+                          <th>Golden Set Answer</th>
+                          <th>Status</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+  `;
+
+  // Add rows for each comparison
+  results.matches.forEach((match) => {
+    html += `
+          <tr>
+              <td>${match.indicator}</td>
+              <td>${match.llmOutput}</td>
+              <td>${match.csvOutput}</td>
+              <td class="${match.isCorrect ? "text-success" : "text-danger"}">
+                  ${match.isCorrect ? "✓ Correct" : "✗ Incorrect"}
+              </td>
+          </tr>
+      `;
+  });
+
+  resultsDiv.innerHTML = html;
+}
