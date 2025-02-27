@@ -90,10 +90,47 @@ const indicators = {
     "Limited evidence of SME finance",
     "Not reported",
   ],
+  "Programs to increase workforce diversity": [
+    "Provides material benefits to facilitate diversity and inclusion, and sets quantitative diversity targets in recruitment process",
+    "Provides material benefits to facilitate diversity and inclusion",
+    "Quantitative diversity targets in recruitment process",
+    "General statements on plans to improve diversity in workforce",
+    "No evidence",
+  ],
+  "Workforce eligible for non-pay benefits": [
+    "Benefits cover all employees",
+    "Benefits cover selected employees",
+    "Scope not determinable",
+    "Minimum practices expected based on domestic industry norms",
+    "No evidence",
+  ],
+  "Workforce diversity policy and management oversight": [
+    "Employee training on diversity policy, supported by senior executive or higher level of oversight on diversity performance",
+    "Senior executive or higher level of oversight on diversity performance",
+    "Employee training on diversity policy",
+    "General statements on diversity and equal opportunity",
+    "No evidence",
+  ],
+  "Data Breach/ Incident Response Plan": [
+    "Both proactive and reactive measures are in place",
+    "Proactive measures are in place",
+    "Reactive measures are in place",
+    "General statements on data breach/ incident response plan",
+    "Minimum practices expected based on domestic industry norms",
+    "No evidence",
+  ],
+  "Managerial and leadership development training": [
+    "Comprehensive succession planning & development programs at multiple levels",
+    "Programs focusing on internal upward mobility through training and development",
+    "General statements on leadership training with unknown scope or achieved results",
+    "Minimum practices expected based on domestic industry norms",
+    "No evidence",
+  ],
+  "Job-specific development training programs": ["Sector leading programs", "Yes", "No", "Not disclosed"],
 };
 
-let pdfName="";
-let analysis="";
+let pdfName = "";
+let analysis = "";
 const elements = {
   urlInput: document.getElementById("urlInput"),
   fileInput: document.getElementById("fileInput"),
@@ -407,18 +444,18 @@ function displayResults(results) {
 
 function resetUI() {
   // Reset the results
-  document.getElementById("results").innerHTML = '';
-  document.getElementById("goldenSetResults").innerHTML = '';
-  
+  document.getElementById("results").innerHTML = "";
+  document.getElementById("goldenSetResults").innerHTML = "";
+
   // Reset file inputs
-  document.getElementById("csvUpload").value = '';
-  
+  document.getElementById("csvUpload").value = "";
+
   // Reset the golden set div visibility
   document.getElementById("goldenSetDiv").classList.add("d-none");
-  
+
   // Clear any error messages
   document.getElementById("errorAlert").classList.add("d-none");
-  document.getElementById("errorAlert").textContent = '';
+  document.getElementById("errorAlert").textContent = "";
 }
 
 elements.analyzeBtn.addEventListener("click", async () => {
@@ -435,7 +472,7 @@ elements.analyzeBtn.addEventListener("click", async () => {
       const text = await response.text();
       textWithPages = [{ page: 1, text }];
     } else if (elements.fileInput.files[0]) {
-      pdfName=elements.fileInput.files[0].name;
+      pdfName = elements.fileInput.files[0].name;
       textWithPages = await extractText(elements.fileInput.files[0]);
     } else {
       throw new Error("Please provide a URL or upload a PDF file");
@@ -466,7 +503,7 @@ elements.fileInput.addEventListener("change", async (e) => {
       const text = await response.text();
       textWithPages = [{ page: 1, text }];
     } else if (elements.fileInput.files[0]) {
-      pdfName=elements.fileInput.files[0].name;
+      pdfName = elements.fileInput.files[0].name;
       textWithPages = await extractText(elements.fileInput.files[0]);
     } else {
       throw new Error("Please provide a URL or upload a PDF file");
@@ -487,13 +524,13 @@ $csvUpload.addEventListener("change", (e) => {
   const file = e.target.files[0];
   // Add validation to check if file exists
   if (!file) {
-    console.error('No file selected');
+    console.error("No file selected");
     return;
   }
 
   // Add validation to check if it's a CSV file
-  if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
-    console.error('Please select a valid CSV file');
+  if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
+    console.error("Please select a valid CSV file");
     return;
   }
 
@@ -505,13 +542,13 @@ $csvUpload.addEventListener("change", (e) => {
   };
 
   reader.onerror = (error) => {
-    console.error('Error reading file:', error);
+    console.error("Error reading file:", error);
   };
 
   try {
     reader.readAsText(file);
   } catch (error) {
-    console.error('Error reading file:', error);
+    console.error("Error reading file:", error);
   }
 });
 
@@ -520,12 +557,12 @@ function processCSVData(csvText) {
   const parseCSV = (text) => {
     const rows = [];
     let row = [];
-    let field = '';
+    let field = "";
     let inQuotes = false;
-    
+
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
-      
+
       if (char === '"') {
         if (inQuotes && text[i + 1] === '"') {
           field += '"';
@@ -533,35 +570,36 @@ function processCSVData(csvText) {
         } else {
           inQuotes = !inQuotes;
         }
-      } else if (char === ',' && !inQuotes) {
+      } else if (char === "," && !inQuotes) {
         row.push(field.trim());
-        field = '';
-      } else if ((char === '\n' || char === '\r') && !inQuotes) {
+        field = "";
+      } else if ((char === "\n" || char === "\r") && !inQuotes) {
         if (field || row.length > 0) {
           row.push(field.trim());
-          if (row.length > 0) {  // Only add non-empty rows
+          if (row.length > 0) {
+            // Only add non-empty rows
             rows.push(row);
           }
           row = [];
-          field = '';
+          field = "";
         }
       } else {
         field += char;
       }
     }
-    
+
     // Handle last field and row
     if (field || row.length > 0) {
       row.push(field.trim());
       rows.push(row);
     }
-    
+
     return rows;
   };
 
   const rows = parseCSV(csvText);
-  
-  const headers = rows[0].map(h => h.toLowerCase().trim());
+
+  const headers = rows[0].map((h) => h.toLowerCase().trim());
 
   // Find required column indices
   const nameIndex = headers.findIndex((h) => h === "name");
@@ -602,25 +640,24 @@ function compareWithLLMOutput(csvData) {
   const totalIndicators = Object.keys(indicators).length;
   // Function to normalize string (lowercase, trim, replace multiple spaces)
   const normalizeString = (str) => {
-    return str?.toLowerCase().trim().replace(/\s+/g, ' ') || '';
+    return str?.toLowerCase().trim().replace(/\s+/g, " ") || "";
   };
 
   // Compare each indicator with CSV data
   for (const indicator of Object.keys(indicators)) {
-
     // Find matching analysis object for this indicator
-    const analysisEntry = analysis.find(item => item.indicator === indicator);
+    const analysisEntry = analysis.find((item) => item.indicator === indicator);
     const llmConclusion = normalizeString(analysisEntry?.conclusion);
 
     // Find matching CSV entry using find method
-    const csvEntry = csvData.find(row => row.dpName.toLowerCase() === indicator.toLowerCase());
+    const csvEntry = csvData.find((row) => row.dpName.toLowerCase() === indicator.toLowerCase());
     const csvConclusion = normalizeString(csvEntry?.correctAnswer);
 
     if (!csvConclusion) {
       correctCount++;
       matches.push({
         indicator,
-        llmOutput: analysisEntry?.conclusion || 'N/A',
+        llmOutput: analysisEntry?.conclusion || "N/A",
         csvOutput: "Not present in CSV",
         isCorrect: true,
       });
@@ -633,8 +670,8 @@ function compareWithLLMOutput(csvData) {
 
     matches.push({
       indicator,
-      llmOutput: analysisEntry?.conclusion || 'N/A',
-      csvOutput: csvEntry?.correctAnswer || 'N/A',
+      llmOutput: analysisEntry?.conclusion || "N/A",
+      csvOutput: csvEntry?.correctAnswer || "N/A",
       isCorrect,
     });
   }
@@ -643,11 +680,11 @@ function compareWithLLMOutput(csvData) {
 
   // Display results in table format
   const resultsDiv = document.getElementById("goldenSetResults");
-  
+
   let html = `
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title ${accuracy >= 80 ? 'text-success' : accuracy >= 40 ? 'text-warning' : 'text-danger'}">
+        <h4 class="card-title ${accuracy >= 80 ? "text-success" : accuracy >= 40 ? "text-warning" : "text-danger"}">
           Accuracy: ${accuracy.toFixed(2)}%
         </h4>
         <p class="card-text">Correct matches: ${correctCount}/${totalIndicators}</p>
@@ -666,14 +703,14 @@ function compareWithLLMOutput(csvData) {
   `;
 
   // Add rows for each comparison
-  matches.forEach(match => {
+  matches.forEach((match) => {
     html += `
       <tr>
         <td>${match.indicator}</td>
         <td>${match.llmOutput}</td>
         <td>${match.csvOutput}</td>
-        <td class="${match.isCorrect ? 'text-success' : 'text-danger'}">
-          ${match.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+        <td class="${match.isCorrect ? "text-success" : "text-danger"}">
+          ${match.isCorrect ? "✓ Correct" : "✗ Incorrect"}
         </td>
       </tr>
     `;
