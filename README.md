@@ -15,13 +15,15 @@ This application allows users to upload PDF documents or provide URLs to PDFs co
 - **Conclusion Generation**: Automated conclusions based on extracted evidence
 - **Dark/Light Mode**: Toggle between dark and light themes for comfortable viewing
 - **Golden Set Comparison**: Upload CSV files to compare extraction results with ground truth data
-- **Accuracy Metrics**: Calculate and display precision, recall, and F1 scores for extraction quality
+- **Accuracy Metrics**: Calculates and displays accuracy metrics for comparison with other tools
 
 ## Project Structure
 ```
-ESGExtraction/
+RatingsCriticalData/
 ├── index.html          # Main HTML file with UI structure
-├── script.js           # JavaScript module with application logic
+├── static/
+│   └── script.js       # JavaScript module with application logic
+├── .gitignore          # Git ignore file for excluding files from version control
 ├── README.md           # Project documentation (this file)
 ```
 
@@ -74,4 +76,4 @@ The application follows a modular architecture with these key components:
 5. Review the extracted indicators and evidence in the results section
 
 ## License
-Copyright © 2025 Gramener. All rights reserved.
+Copyright 2025 Gramener. All rights reserved.
