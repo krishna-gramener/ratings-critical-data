@@ -5,129 +5,12 @@ const { token } = await fetch("https://llmfoundry.straive.com/token", { credenti
 const $dropdown = document.getElementById("dropdown");
 const $goldenSetDiv = document.getElementById("goldenSetDiv");
 const $csvUpload = document.getElementById("csvUpload");
-const indicators = {
-  "Employee Turnover": [
-    "Overall assessment as Above industry average, increasing trend",
-    "On par with industry average;On par with industry average, increasing trend",
-    "On par with industry average, decreasing trend",
-    "Below industry average, decreasing trend",
-    "Not Reported",
-  ],
-  "Formal Talent Pipeline Development Strategy": ["Yes", "No", "Not Reported"],
-  "Involvement in Developing or Distributing Hybrid or Electric Vehicles": [
-    "No Value",
-    "Pure play (revenues >50%)",
-    "Core business (revenues 20-50%)",
-    "Non-core involvement (revenues <20%)",
-    "R&D underway / exploring opportunities",
-    "Not Reported",
-  ],
-  "Involvement in Developing or Distributing LED Lighting": [
-    "No Value",
-    "Pure play (revenues >50%)",
-    "Core business (revenues 20-50%)",
-    "Non-core involvement (revenues <20%)",
-    "R&D underway / exploring opportunities",
-    "Not Reported",
-  ],
-  "Involvement in Generation or Development of Solar Power Capacity": [
-    "No Value",
-    "Pure play (revenues >50%)",
-    "Core business (revenues 20-50%)",
-    "Non-core involvement (revenues <20%)",
-    "R&D underway / exploring opportunities",
-    "Not Reported",
-  ],
-  "Involvement in Production or Distribution of Batteries": [
-    "No Value",
-    "Pure play (revenues >50%)",
-    "Core business (revenues 20-50%)",
-    "Non-core involvement (revenues <20%)",
-    "R&D underway / exploring opportunities",
-    "Not Reported",
-  ],
-  "Involvement in Production or Distribution of Industrial Automation Technologies": [
-    "No Value",
-    "Pure play (revenues >50%)",
-    "Core business (revenues 20-50%)",
-    "Non-core involvement (revenues <20%)",
-    "R&D underway / exploring opportunities",
-    "Not Reported",
-  ],
-  "Privacy Enhancing Technologies and Initiatives": [
-    "Data protection safeguards integrated into product & service development",
-    "Initiatives developed to protect and empower customers/users",
-    "Basic education towards customers/users on how to protect themselves online",
-    "Not Reported",
-  ],
-  "Innovation in Other Alternative Branchless Distribution Channels": [
-    "Sector leading innovation in alternative branchless distribution channels targeting underserveddemographics",
-    "Innovation in alternative branchless distribution channels targeting underserved demographics",
-    "Alternative branchless distribution channels with some focus on targeting underserved demographics",
-    "Evidence of alternative branchless distribution channels but no information on distributiontargeting underserved demographics",
-    "Limited or no evidence of alternative branchless distribution channels",
-  ],
-  "Extent of Supply Chain Initiatives to Address Impacts of Timber and/or Paper Production": [
-    "Requires all suppliers to produce or purchase sustainable timber/paper and verifies compliance",
-    "In process of implementing sustainable timber purchasing requirements at core suppliers",
-    "Has pilot projects on EITHER reducing environmental impact of pulp processing OR purchasing timber from identified sustainable and legal sources",
-    "Educates suppliers on responsible timber/paper sourcing and production",
-    "General Statement",
-    "Not Reported",
-  ],
-  "Achievements on Packaging Content": [
-    "Achievements have broad scope (company-wide or across all relevant packaging)",
-    "There is evidence of improvement",
-    "Achievements apply to individual product or package lines only",
-    "General statement",
-    "Not Reported",
-  ],
-  "SME Business - Assessment": [
-    "Global leader on SME finance (over 40% of total lending)",
-    "Above-average level of SME finance",
-    "Average level of SME finance",
-    "Below-average level of SME finance",
-    "Limited evidence of SME finance",
-    "Not reported",
-  ],
-  "Programs to increase workforce diversity": [
-    "Provides material benefits to facilitate diversity and inclusion, and sets quantitative diversity targets in recruitment process",
-    "Provides material benefits to facilitate diversity and inclusion",
-    "Quantitative diversity targets in recruitment process",
-    "General statements on plans to improve diversity in workforce",
-    "No evidence",
-  ],
-  "Workforce eligible for non-pay benefits": [
-    "Benefits cover all employees",
-    "Benefits cover selected employees",
-    "Scope not determinable",
-    "Minimum practices expected based on domestic industry norms",
-    "No evidence",
-  ],
-  "Workforce diversity policy and management oversight": [
-    "Employee training on diversity policy, supported by senior executive or higher level of oversight on diversity performance",
-    "Senior executive or higher level of oversight on diversity performance",
-    "Employee training on diversity policy",
-    "General statements on diversity and equal opportunity",
-    "No evidence",
-  ],
-  "Data Breach/ Incident Response Plan": [
-    "Both proactive and reactive measures are in place",
-    "Proactive measures are in place",
-    "Reactive measures are in place",
-    "General statements on data breach/ incident response plan",
-    "Minimum practices expected based on domestic industry norms",
-    "No evidence",
-  ],
-  "Managerial and leadership development training": [
-    "Comprehensive succession planning & development programs at multiple levels",
-    "Programs focusing on internal upward mobility through training and development",
-    "General statements on leadership training with unknown scope or achieved results",
-    "Minimum practices expected based on domestic industry norms",
-    "No evidence",
-  ],
-  "Job-specific development training programs": ["Sector leading programs", "Yes", "No", "Not disclosed"],
-};
+const $indicatorInfoCard = document.getElementById("indicatorInfoCard");
+
+const { indicators, indicatorsInformation } = await fetch("config.json").then((r) => r.json());
+
+// Create a copy of the original indicator information that we can update
+let updatedIndicatorsInformation = JSON.parse(JSON.stringify(indicatorsInformation));
 
 let pdfName = "";
 let analysis = "";
@@ -207,6 +90,116 @@ dropdownContainer.appendChild(row);
 // Insert dropdowns into the dropdown div
 $dropdown.appendChild(dropdownContainer);
 
+// Initially hide the indicator info card
+$indicatorInfoCard.classList.add("d-none");
+
+// Add toggle behavior for the chevron icon
+document.getElementById("indicatorInfoHeader").addEventListener("click", function () {
+  const chevron = this.querySelector(".bi-chevron-down, .bi-chevron-up");
+  if (chevron.classList.contains("bi-chevron-down")) {
+    chevron.classList.replace("bi-chevron-down", "bi-chevron-up");
+  } else {
+    chevron.classList.replace("bi-chevron-up", "bi-chevron-down");
+  }
+});
+
+// Function to update textarea with indicator information
+function updateIndicatorInfo(indicatorName = null) {
+  // If no indicator name is provided, use the currently selected one from the dropdown
+  const selectedIndicator = indicatorName || indicatorSelect.value;
+  const infoTextarea = document.getElementById("indicatorInfoTextarea");
+
+  // Update the dropdown to match the selected indicator
+  if (indicatorName) {
+    // Find the option with the matching value and set it as selected
+    for (let i = 0; i < indicatorSelect.options.length; i++) {
+      if (indicatorSelect.options[i].value === indicatorName) {
+        indicatorSelect.selectedIndex = i;
+        updateValueDropdown(); // Update the values dropdown as well
+        break;
+      }
+    }
+  }
+
+  if (updatedIndicatorsInformation[selectedIndicator]) {
+    const info = updatedIndicatorsInformation[selectedIndicator];
+    
+    // Check if the info is already in text format (from textarea)
+    if (typeof info === 'string') {
+      infoTextarea.value = info;
+    } else {
+      // Convert structured data to text format
+      let infoText = `Objective: ${info.Objective}\n\n`;
+
+      infoText += "Focus Areas:\n";
+      info["Focus Areas"].forEach((area) => {
+        infoText += `- ${area}\n`;
+      });
+      infoText += "\n";
+
+      infoText += "Inclusion Criteria:\n";
+      info["Inclusion Criteria"].forEach((criteria) => {
+        infoText += `- ${criteria}\n`;
+      });
+      infoText += "\n";
+
+      infoText += "Exclusion Criteria:\n";
+      info["Exclusion Criteria"].forEach((criteria) => {
+        infoText += `- ${criteria}\n`;
+      });
+      infoText += "\n";
+
+      infoText += `Accuracy Requirements: ${info["Accuracy Requirements"]}`;
+
+      infoTextarea.value = infoText;
+    }
+  } else {
+    infoTextarea.value = "No detailed information available for this indicator.";
+  }
+}
+
+// Initial population of indicator information
+updateIndicatorInfo();
+
+// Add event listener for indicator change to update information
+indicatorSelect.addEventListener("change", () => {
+  updateValueDropdown();
+  updateIndicatorInfo();
+});
+
+// Add event listener for update button
+document.getElementById("updateIndicatorInfoBtn").addEventListener("click", async () => {
+  const infoTextarea = document.getElementById("indicatorInfoTextarea");
+  const selectedIndicator = indicatorSelect.value;
+
+  // Only proceed if we have text content and an active analysis
+  if (infoTextarea.value.trim() && analysis) {
+    elements.loadingSpinner.classList.remove("d-none");
+    elements.results.innerHTML = "";
+
+    try {
+      // Create a custom indicatorInformation object to send to the LLM
+      const customIndicatorInfo = {};
+      customIndicatorInfo[selectedIndicator] = infoTextarea.value;
+
+      // Update our global updatedIndicatorsInformation
+      updatedIndicatorsInformation[selectedIndicator] = infoTextarea.value;
+
+      // Re-analyze with the updated indicator information
+      const results = await analyzeDocument(analysis, customIndicatorInfo);
+      displayResults(results);
+    } catch (error) {
+      elements.errorAlert.textContent = `Error: ${error.message}`;
+      elements.errorAlert.classList.remove("d-none");
+    } finally {
+      elements.loadingSpinner.classList.add("d-none");
+    }
+  } else if (!analysis) {
+    elements.errorAlert.textContent = "Please analyze a document first.";
+    elements.errorAlert.classList.remove("d-none");
+  }
+});
+
 async function extractText(file) {
   try {
     const arrayBuffer = await file.arrayBuffer();
@@ -225,9 +218,55 @@ async function extractText(file) {
   }
 }
 
-async function analyzeDocument(textWithPages) {
+async function analyzeDocument(textWithPages, customIndicatorInfo = null) {
   try {
     const text = textWithPages.map((p) => `[Page ${p.page}] ${p.text}`).join("\n");
+
+    // Determine which indicator information to use
+    let indicatorInfoToUse = updatedIndicatorsInformation;
+    if (customIndicatorInfo) {
+      // If we have custom indicator info, use it for the specified indicator
+      // but keep the rest of the indicators from the current updated information
+      indicatorInfoToUse = { ...updatedIndicatorsInformation };
+
+      // For each custom indicator, replace or add it to the information object
+      Object.keys(customIndicatorInfo).forEach((indicator) => {
+        // Parse the custom text format back into structured data
+        const customText = customIndicatorInfo[indicator];
+        const parsedInfo = {
+          Objective: "",
+          "Focus Areas": [],
+          "Inclusion Criteria": [],
+          "Exclusion Criteria": [],
+          "Accuracy Requirements": "",
+        };
+
+        // Simple parsing of the formatted text
+        const lines = customText.split("\n");
+        let currentSection = null;
+
+        lines.forEach((line) => {
+          if (line.startsWith("Objective:")) {
+            parsedInfo.Objective = line.replace("Objective:", "").trim();
+            currentSection = null;
+          } else if (line.startsWith("Focus Areas:")) {
+            currentSection = "Focus Areas";
+          } else if (line.startsWith("Inclusion Criteria:")) {
+            currentSection = "Inclusion Criteria";
+          } else if (line.startsWith("Exclusion Criteria:")) {
+            currentSection = "Exclusion Criteria";
+          } else if (line.startsWith("Accuracy Requirements:")) {
+            parsedInfo["Accuracy Requirements"] = line.replace("Accuracy Requirements:", "").trim();
+            currentSection = null;
+          } else if (line.trim().startsWith("- ") && currentSection) {
+            parsedInfo[currentSection].push(line.trim().substring(2));
+          }
+        });
+
+        // Update the indicator information
+        indicatorInfoToUse[indicator] = parsedInfo;
+      });
+    }
 
     const response = await fetch(
       "https://llmfoundry.straive.com/gemini/v1beta/models/gemini-1.5-flash-latest:generateContent",
@@ -235,7 +274,7 @@ async function analyzeDocument(textWithPages) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}:rating-critical-data`,
         },
         credentials: "include",
         body: JSON.stringify({
@@ -290,7 +329,8 @@ Your response must strictly follow this JSON schema:
   }
 }
 
-Return ONLY valid JSON that matches this schema exactly. Do not include any other text or explanation.`,
+Return ONLY valid JSON that matches this schema exactly. Do not include any other text or explanation.
+You can REFER to ${JSON.stringify(indicatorInfoToUse)} to understand the indicators better`,
               },
             ],
           },
@@ -378,6 +418,7 @@ function displayResults(results) {
       const presence = result.present.toLowerCase().includes("yes");
       const confidence = parseInt(result.confidence) || 0;
       $dropdown.classList.remove("d-none");
+      $indicatorInfoCard.classList.remove("d-none");
       const card = document.createElement("div");
       card.className = "accordion-item";
       card.innerHTML = `
@@ -434,6 +475,9 @@ function displayResults(results) {
         // Update value dropdown and select the conclusion
         updateValueDropdown();
         valueSelect.value = result.conclusion;
+
+        // Also update the indicator information in the collapsible card
+        updateIndicatorInfo(result.indicator);
       });
 
       elements.results.appendChild(card);
@@ -450,18 +494,25 @@ function resetUI() {
   // Reset file inputs
   document.getElementById("csvUpload").value = "";
 
+  // Reset dropdown visibility
+  $dropdown.classList.add("d-none");
+  $indicatorInfoCard.classList.add("d-none");
+
   // Reset the golden set div visibility
   document.getElementById("goldenSetDiv").classList.add("d-none");
 
   // Clear any error messages
   document.getElementById("errorAlert").classList.add("d-none");
   document.getElementById("errorAlert").textContent = "";
+
+  // Reset analysis data
+  analysis = null;
 }
 
 elements.analyzeBtn.addEventListener("click", async () => {
+  resetUI(); // Reset UI before starting new analysis
   elements.errorAlert.classList.add("d-none");
   elements.loadingSpinner.classList.remove("d-none");
-  elements.results.innerHTML = "";
 
   try {
     let textWithPages;
@@ -478,8 +529,12 @@ elements.analyzeBtn.addEventListener("click", async () => {
       throw new Error("Please provide a URL or upload a PDF file");
     }
 
-    analysis = await analyzeDocument(textWithPages);
-    displayResults(analysis);
+    // Store the original text with pages for future re-analysis
+    analysis = textWithPages;
+
+    // Analyze the document
+    const results = await analyzeDocument(textWithPages);
+    displayResults(results);
   } catch (error) {
     console.error("Error : ", error);
     elements.errorAlert.textContent = error.message;
@@ -490,34 +545,9 @@ elements.analyzeBtn.addEventListener("click", async () => {
 });
 
 elements.fileInput.addEventListener("change", async (e) => {
-  try {
-    resetUI(); // Reset everything when new file is selected
-    elements.loadingSpinner.classList.remove("d-none");
-    elements.results.innerHTML = "";
-    elements.errorAlert.classList.add("d-none");
-
-    let textWithPages = [];
-
-    if (elements.urlInput.value) {
-      const response = await fetch(elements.urlInput.value);
-      const text = await response.text();
-      textWithPages = [{ page: 1, text }];
-    } else if (elements.fileInput.files[0]) {
-      pdfName = elements.fileInput.files[0].name;
-      textWithPages = await extractText(elements.fileInput.files[0]);
-    } else {
-      throw new Error("Please provide a URL or upload a PDF file");
-    }
-
-    analysis = await analyzeDocument(textWithPages);
-    displayResults(analysis);
-  } catch (error) {
-    console.error("Error : ", error);
-    elements.errorAlert.textContent = error.message;
-    elements.errorAlert.classList.remove("d-none");
-  } finally {
-    elements.loadingSpinner.classList.add("d-none");
-  }
+  // Don't automatically analyze on file change, just reset the UI
+  resetUI();
+  elements.errorAlert.classList.add("d-none");
 });
 
 $csvUpload.addEventListener("change", (e) => {

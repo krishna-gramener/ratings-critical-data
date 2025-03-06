@@ -1,0 +1,406 @@
+{
+  "indicators": {
+    "Employee Turnover": [
+      "Overall assessment as Above industry average, increasing trend",
+      "On par with industry average;On par with industry average, increasing trend",
+      "On par with industry average, decreasing trend",
+      "Below industry average, decreasing trend",
+      "Not Reported"
+    ],
+    "Formal Talent Pipeline Development Strategy": ["Yes", "No", "Not Reported"],
+    "Involvement in Developing or Distributing Hybrid or Electric Vehicles": [
+      "No Value",
+      "Pure play (revenues >50%)",
+      "Core business (revenues 20-50%)",
+      "Non-core involvement (revenues <20%)",
+      "R&D underway / exploring opportunities",
+      "Not Reported"
+    ],
+    "Involvement in Developing or Distributing LED Lighting": [
+      "No Value",
+      "Pure play (revenues >50%)",
+      "Core business (revenues 20-50%)",
+      "Non-core involvement (revenues <20%)",
+      "R&D underway / exploring opportunities",
+      "Not Reported"
+    ],
+    "Involvement in Generation or Development of Solar Power Capacity": [
+      "No Value",
+      "Pure play (revenues >50%)",
+      "Core business (revenues 20-50%)",
+      "Non-core involvement (revenues <20%)",
+      "R&D underway / exploring opportunities",
+      "Not Reported"
+    ],
+    "Involvement in Production or Distribution of Batteries": [
+      "No Value",
+      "Pure play (revenues >50%)",
+      "Core business (revenues 20-50%)",
+      "Non-core involvement (revenues <20%)",
+      "R&D underway / exploring opportunities",
+      "Not Reported"
+    ],
+    "Involvement in Production or Distribution of Industrial Automation Technologies": [
+      "No Value",
+      "Pure play (revenues >50%)",
+      "Core business (revenues 20-50%)",
+      "Non-core involvement (revenues <20%)",
+      "R&D underway / exploring opportunities",
+      "Not Reported"
+    ],
+    "Privacy Enhancing Technologies and Initiatives": [
+      "Data protection safeguards integrated into product & service development",
+      "Initiatives developed to protect and empower customers/users",
+      "Basic education towards customers/users on how to protect themselves online",
+      "Not Reported"
+    ],
+    "Innovation in Other Alternative Branchless Distribution Channels": [
+      "Sector leading innovation in alternative branchless distribution channels targeting underserveddemographics",
+      "Innovation in alternative branchless distribution channels targeting underserved demographics",
+      "Alternative branchless distribution channels with some focus on targeting underserved demographics",
+      "Evidence of alternative branchless distribution channels but no information on distributiontargeting underserved demographics",
+      "Limited or no evidence of alternative branchless distribution channels"
+    ],
+    "Extent of Supply Chain Initiatives to Address Impacts of Timber and/or Paper Production": [
+      "Requires all suppliers to produce or purchase sustainable timber/paper and verifies compliance",
+      "In process of implementing sustainable timber purchasing requirements at core suppliers",
+      "Has pilot projects on EITHER reducing environmental impact of pulp processing OR purchasing timber from identified sustainable and legal sources",
+      "Educates suppliers on responsible timber/paper sourcing and production",
+      "General Statement",
+      "Not Reported"
+    ],
+    "Achievements on Packaging Content": [
+      "Achievements have broad scope (company-wide or across all relevant packaging)",
+      "There is evidence of improvement",
+      "Achievements apply to individual product or package lines only",
+      "General statement",
+      "Not Reported"
+    ],
+    "SME Business - Assessment": [
+      "Global leader on SME finance (over 40% of total lending)",
+      "Above-average level of SME finance",
+      "Average level of SME finance",
+      "Below-average level of SME finance",
+      "Limited evidence of SME finance",
+      "Not reported"
+    ],
+    "Programs to increase workforce diversity": [
+      "Provides material benefits to facilitate diversity and inclusion, and sets quantitative diversity targets in recruitment process",
+      "Provides material benefits to facilitate diversity and inclusion",
+      "Quantitative diversity targets in recruitment process",
+      "General statements on plans to improve diversity in workforce",
+      "No evidence"
+    ],
+    "Workforce eligible for non-pay benefits": [
+      "Benefits cover all employees",
+      "Benefits cover selected employees",
+      "Scope not determinable",
+      "Minimum practices expected based on domestic industry norms",
+      "No evidence"
+    ],
+    "Workforce diversity policy and management oversight": [
+      "Employee training on diversity policy, supported by senior executive or higher level of oversight on diversity performance",
+      "Senior executive or higher level of oversight on diversity performance",
+      "Employee training on diversity policy",
+      "General statements on diversity and equal opportunity",
+      "No evidence"
+    ],
+    "Data Breach/ Incident Response Plan": [
+      "Both proactive and reactive measures are in place",
+      "Proactive measures are in place",
+      "Reactive measures are in place",
+      "General statements on data breach/ incident response plan",
+      "Minimum practices expected based on domestic industry norms",
+      "No evidence"
+    ],
+    "Managerial and leadership development training": [
+      "Comprehensive succession planning & development programs at multiple levels",
+      "Programs focusing on internal upward mobility through training and development",
+      "General statements on leadership training with unknown scope or achieved results",
+      "Minimum practices expected based on domestic industry norms",
+      "No evidence"
+    ],
+    "Job-specific development training programs": ["Sector leading programs", "Yes", "No", "Not disclosed"]
+  },
+  "indicatorsInformation": {
+    "Employee Turnover": {
+      "Objective": "Assess the rate of employee turnover within the organization based on guidelines and SME insights.",
+      "Focus Areas": ["Voluntary turnover rate", "Involuntary turnover rate", "Total turnover rate"],
+      "Inclusion Criteria": [
+        "Turnover percentages explicitly stated",
+        "Evidence from HR reports or official documents"
+      ],
+      "Exclusion Criteria": ["Estimated or inferred turnover figures", "Data not explicitly stated"],
+      "Accuracy Requirements": "Ensure the data is directly sourced from documented figures without assumptions."
+    },
+    "Formal Talent Pipeline Development Strategy": {
+      "Objective": "Evaluate the existence and effectiveness of formal strategies for developing talent pipelines.",
+      "Focus Areas": ["Formal programs", "Leadership development", "Succession planning"],
+      "Inclusion Criteria": [
+        "Descriptions of formal strategies or documented initiatives",
+        "Statements linking programs to business strategy"
+      ],
+      "Exclusion Criteria": ["Informal or undocumented practices"],
+      "Accuracy Requirements": "Extract only officially documented strategies with clear evidence."
+    },
+    "Involvement in Developing or Distributing Hybrid or Electric Vehicles": {
+      "Objective": "Determine the company's involvement in the production or distribution of hybrid or electric vehicles.",
+      "Focus Areas": [
+        "Revenue percentage from hybrid/electric vehicle activities",
+        "Product offerings related to hybrid/electric vehicles"
+      ],
+      "Inclusion Criteria": [
+        "Explicit mention of revenue generated from hybrid/electric vehicle products or services",
+        "Details about the company's involvement in the production or distribution of hybrid/electric vehicles"
+      ],
+      "Exclusion Criteria": [
+        "Company's internal initiatives to improve facilities",
+        "Inferred or estimated revenue figures"
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Involvement in Developing or Distributing LED Lighting": {
+      "Objective": "Determine the company's involvement in the production or distribution of LED lighting.",
+      "Focus Areas": ["Revenue percentage from LED lighting activities", "Product offerings related to LED lighting"],
+      "Inclusion Criteria": [
+        "Explicit mention of revenue generated from LED lighting products or services",
+        "Details about the company's involvement in the production or distribution of LED lighting"
+      ],
+      "Exclusion Criteria": [
+        "Company's internal initiatives to improve facilities",
+        "Inferred or estimated revenue figures"
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Involvement in Generation or Development of Solar Power Capacity": {
+      "Objective": "Determine the company's involvement in the production or distribution of solar power.",
+      "Focus Areas": ["Revenue percentage from solar power activities", "Product offerings related to solar power"],
+      "Inclusion Criteria": [
+        "Explicit mention of revenue generated from solar power products or services",
+        "Details about the company's involvement in the production or distribution of solar power"
+      ],
+      "Exclusion Criteria": [
+        "Company's internal initiatives to improve facilities",
+        "Inferred or estimated revenue figures"
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Involvement in Production or Distribution of Batteries": {
+      "Objective": "Determine the company's involvement in the production or distribution of batteries.",
+      "Focus Areas": ["Revenue percentage from battery activities", "Product offerings related to batteries"],
+      "Inclusion Criteria": [
+        "Explicit mention of revenue generated from battery products or services",
+        "Details about the company's involvement in the production or distribution of batteries"
+      ],
+      "Exclusion Criteria": [
+        "Company's internal initiatives to improve facilities",
+        "Inferred or estimated revenue figures"
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Involvement in Production or Distribution of Industrial Automation Technologies": {
+      "Objective": "Determine the company's involvement in the production or distribution of industrial automation technologies.",
+      "Focus Areas": [
+        "Revenue percentage from industrial automation activities",
+        "Product offerings related to industrial automation"
+      ],
+      "Inclusion Criteria": [
+        "Explicit mention of revenue generated from industrial automation products or services",
+        "Details about the company's involvement in the production or distribution of industrial automation technologies"
+      ],
+      "Exclusion Criteria": [
+        "Company's internal initiatives to improve facilities",
+        "Inferred or estimated revenue figures"
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Privacy Enhancing Technologies and Initiatives": {
+      "Objective": "Assess the company's integration of privacy-enhancing technologies and initiatives in its products and services.",
+      "Focus Areas": [
+        "Data protection safeguards integrated into product development",
+        "Initiatives to protect and empower customers",
+        "Customer education on online protection"
+      ],
+      "Inclusion Criteria": [
+        "Evidence of privacy-by-design principles",
+        "Details on implementation of privacy-enhancing technologies",
+        "Examples of customer-facing privacy initiatives"
+      ],
+      "Exclusion Criteria": ["General statements without specific examples", "Vague or unsupported claims"],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Innovation in Other Alternative Branchless Distribution Channels": {
+      "Objective": "Assess the company's innovation in alternative branchless distribution channels targeting underserved demographics.",
+      "Focus Areas": [
+        "Innovation in mobile/online distribution targeting underserved demographics",
+        "Partnerships with underserved communities",
+        "Specific examples of alternative channels"
+      ],
+      "Inclusion Criteria": [
+        "Explicit mention of innovations targeting underserved demographics",
+        "Evidence of partnerships with relevant organizations",
+        "Examples of specific distribution channels"
+      ],
+      "Exclusion Criteria": [
+        "General statements without specific examples",
+        "Lack of evidence of targeting underserved demographics"
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Extent of Supply Chain Initiatives to Address Impacts of Timber and/or Paper Production": {
+      "Objective": "Assess the company's supply chain initiatives to address the impacts of timber and/or paper production.",
+      "Focus Areas": [
+        "Sustainable timber/paper sourcing requirements",
+        "Supplier compliance verification",
+        "Pilot projects on reducing environmental impact"
+      ],
+      "Inclusion Criteria": [
+        "Explicit mention of sustainable sourcing policies",
+        "Evidence of supplier verification processes",
+        "Details of pilot projects or initiatives"
+      ],
+      "Exclusion Criteria": ["General statements without specific examples", "Lack of evidence of supplier engagement"],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Achievements on Packaging Content": {
+      "Objective": "Assess the company's achievements in packaging content, including recycled content and lightweighting.",
+      "Focus Areas": [
+        "Recycled content in packaging",
+        "Lightweighting initiatives",
+        "Specific product or package lines"
+      ],
+      "Inclusion Criteria": [
+        "Explicit mention of recycled or renewable materials used in packaging",
+        "Evidence of specific product or package line improvements",
+        "Quantifiable data on packaging changes"
+      ],
+      "Exclusion Criteria": ["General statements without specific examples", "Lack of quantifiable data"],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "SME Business - Assessment": {
+      "Objective": "Assess the company's involvement in SME finance.",
+      "Focus Areas": [
+        "Percentage of SME financing",
+        "Specific programs for SMEs",
+        "Quantitative metrics related to SME lending"
+      ],
+      "Inclusion Criteria": [
+        "Explicit mention of SME lending or financing",
+        "Quantitative data on SME lending or financing",
+        "Evidence of programs or initiatives targeting SMEs"
+      ],
+      "Exclusion Criteria": ["General statements without specific examples", "Lack of quantitative data"],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Programs to increase workforce diversity": {
+      "Objective": "Assess a company's efforts to increase diversity in its workforce.",
+      "Focus Areas": [
+        "Material benefits to facilitate diversity and inclusion",
+        "Quantitative diversity targets in recruitment process",
+        "General statements on plans to improve diversity in workforce",
+        "Evidence of CEO or other executive pay linked to increased diversity in the workforce"
+      ],
+      "Inclusion Criteria": [
+        "Explicit statements of diversity targets and initiatives.",
+        "Evidence of quantitative diversity targets in recruitment.",
+        "Evidence of material benefits tied to diversity goals.",
+        "General discussion of diversity plans in sustainability reports, websites, or filings."
+      ],
+      "Exclusion Criteria": [
+        "Lack of explicit diversity targets or initiatives.",
+        "General statements without specific targets or actions.",
+        "Employee Resource Groups (ERGs) are not considered."
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Workforce eligible for non-pay benefits": {
+      "Objective": "Determine the scope of the company's workforce covered by non-compensation benefits.",
+      "Focus Areas": [
+        "Scope of parental leave benefits",
+        "Coverage of benefits for all employees (including part-time and contractors)",
+        "Evidence of meeting MSCI's parental leave benchmark",
+        "Evidence of benefit application across all operations"
+      ],
+      "Inclusion Criteria": [
+        "Explicit statements about benefit coverage (all employees, selected employees, etc.).",
+        "Evidence of meeting the MSCI parental leave benchmark.",
+        "Evidence of benefit application across all operations."
+      ],
+      "Exclusion Criteria": [
+        "Lack of explicit statements about benefit coverage.",
+        "Benefits subject to eligibility criteria (e.g., length of service).",
+        "Inferred or estimated benefit coverage.",
+        "Minimum practices expected based on domestic industry norms."
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Workforce diversity policy and management oversight": {
+      "Objective": "Evaluate the company's workforce diversity policy and senior management oversight of its implementation.",
+      "Focus Areas": [
+        "Workforce diversity policy",
+        "Employee training on diversity policy",
+        "Senior management oversight of diversity performance",
+        "Evidence of a C-Suite Chief Diversity Officer (or similar)"
+      ],
+      "Inclusion Criteria": [
+        "Explicit statements of a diversity policy.",
+        "Evidence of employee training on diversity.",
+        "Evidence of senior management oversight of diversity performance.",
+        "Evidence of executive pay linked to diversity targets."
+      ],
+      "Exclusion Criteria": [
+        "Lack of explicit policy statements.",
+        "General statements without specific targets or actions.",
+        "Absence of senior management oversight."
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Data Breach/ Incident Response Plan": {
+      "Objective": "Assess the company's preparedness for data breaches and security incidents.",
+      "Focus Areas": [
+        "Dedicated data breach response team",
+        "Procedures for notifying law enforcement and affected parties",
+        "IT security risk assessment, real-time monitoring, or penetration testing"
+      ],
+      "Inclusion Criteria": [
+        "Explicit descriptions of data breach response plans.",
+        "Details of notification procedures for affected parties.",
+        "Evidence of proactive security measures."
+      ],
+      "Exclusion Criteria": [
+        "Lack of explicit details on response plans.",
+        "General statements without specific procedures.",
+        "Cybersecurity insurance is not considered."
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Managerial and leadership development training": {
+      "Objective": "Evaluate the company's programs for developing managerial and leadership skills.",
+      "Focus Areas": [
+        "Succession planning and development programs",
+        "Programs focusing on internal upward mobility",
+        "Scope of coverage (all employees, full-time employees, etc.)",
+        "Specific training topics related to leadership and management"
+      ],
+      "Inclusion Criteria": [
+        "Explicit descriptions of leadership training programs.",
+        "Evidence of succession planning and development programs.",
+        "Evidence of programs focusing on internal upward mobility.",
+        "Explicit mention of scope of coverage (all employees, etc.)."
+      ],
+      "Exclusion Criteria": [
+        "Lack of explicit details on training programs.",
+        "General statements without specific details.",
+        "Training focused on compliance or risk management."
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
+    },
+    "Job-specific development training programs": {
+      "Objective": "",
+      "Focus Areas": [""],
+      "Inclusion Criteria": [""],
+      "Exclusion Criteria": [""],
+      "Accuracy Requirements": ""
+    }
+  }
+}
