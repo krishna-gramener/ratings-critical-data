@@ -6,14 +6,6 @@ const $dropdown = document.getElementById("dropdown");
 const $goldenSetDiv = document.getElementById("goldenSetDiv");
 const $csvUpload = document.getElementById("csvUpload");
 const $indicatorInfoCard = document.getElementById("indicatorInfoCard");
-
-const { indicators, indicatorsInformation } = await fetch("config.json").then((r) => r.json());
-
-// Create a copy of the original indicator information that we can update
-let updatedIndicatorsInformation = JSON.parse(JSON.stringify(indicatorsInformation));
-
-let pdfName = "";
-let analysis = "";
 const elements = {
   urlInput: document.getElementById("urlInput"),
   fileInput: document.getElementById("fileInput"),
@@ -22,6 +14,14 @@ const elements = {
   errorAlert: document.getElementById("errorAlert"),
   results: document.getElementById("results"),
 };
+
+const { indicators, indicatorsInformation } = await fetch("config.json").then((r) => r.json());
+
+// Create a copy of the original indicator information that we can update
+let updatedIndicatorsInformation = JSON.parse(JSON.stringify(indicatorsInformation));
+let pdfName = "";
+let analysis = "";
+let llmResponseArray = [];
 
 // Create and append dropdowns
 const dropdownContainer = document.createElement("div");
@@ -123,9 +123,9 @@ function updateIndicatorInfo(indicatorName = null) {
 
   if (updatedIndicatorsInformation[selectedIndicator]) {
     const info = updatedIndicatorsInformation[selectedIndicator];
-    
+
     // Check if the info is already in text format (from textarea)
-    if (typeof info === 'string') {
+    if (typeof info === "string") {
       infoTextarea.value = info;
     } else {
       // Convert structured data to text format
@@ -242,9 +242,9 @@ async function analyzeDocument(textWithPages, customIndicatorInfo = null) {
       Object.keys(customIndicatorInfo).forEach((indicator) => {
         // Get the custom text
         const customText = customIndicatorInfo[indicator];
-        
+
         // Check if customText is a string before trying to split it
-        if (typeof customText === 'string') {
+        if (typeof customText === "string") {
           const parsedInfo = {
             Objective: "",
             "Focus Areas": [],
@@ -372,16 +372,13 @@ You can REFER to ${JSON.stringify(indicatorInfoToUse)} to understand the indicat
       let responseText = data.candidates[0].content.parts[0].text;
       // Clean the response text more thoroughly
       responseText = responseText
-        // Remove markdown code block
         .replace(/```json\n?|\n?```/g, "")
-        // Remove any quotes around the entire JSON string
         .replace(/^["']|["']$/g, "")
-        // Remove any extra whitespace at start and end
         .trim();
 
       // Parse the cleaned JSON response
       const llmResponse = JSON.parse(responseText);
-
+      llmResponseArray = llmResponse.results;
       if (!llmResponse.results || !Array.isArray(llmResponse.results)) {
         throw new Error("Invalid response format: missing results array");
       }
@@ -429,16 +426,16 @@ function parseAnalysisResults(content) {
 
 function displayResults(results) {
   elements.results.innerHTML = "";
-  
+
   // Only show UI elements if we have valid results
-  if (results && results.length > 0 && results.some(result => result && Object.keys(result).length > 0)) {
+  if (results && results.length > 0 && results.some((result) => result && Object.keys(result).length > 0)) {
     $dropdown.classList.remove("d-none");
     $indicatorInfoCard.classList.remove("d-none");
   } else {
     $dropdown.classList.add("d-none");
     $indicatorInfoCard.classList.add("d-none");
   }
-  
+
   results.forEach((result, index) => {
     if (result && Object.keys(result).length > 0) {
       const presence = result.present.toLowerCase().includes("yes");
@@ -700,7 +697,7 @@ function compareWithLLMOutput(csvData) {
   // Compare each indicator with CSV data
   for (const indicator of Object.keys(indicators)) {
     // Find matching analysis object for this indicator
-    const analysisEntry = analysis.find((item) => item.indicator === indicator);
+    const analysisEntry = llmResponseArray.find((item) => item.indicator === indicator);
     const llmConclusion = normalizeString(analysisEntry?.conclusion);
 
     // Find matching CSV entry using find method
