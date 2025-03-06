@@ -163,8 +163,17 @@ updateIndicatorInfo();
 
 // Add event listener for indicator change to update information
 indicatorSelect.addEventListener("change", () => {
+  // No need to explicitly save here since the input event listener handles it
+  // Just update the dropdown and load the new indicator info
   updateValueDropdown();
   updateIndicatorInfo();
+});
+
+// Add event listener for textarea changes to automatically save them
+document.getElementById("indicatorInfoTextarea").addEventListener("input", (e) => {
+  const selectedIndicator = indicatorSelect.value;
+  // Always save the current value, even if empty
+  updatedIndicatorsInformation[selectedIndicator] = e.target.value;
 });
 
 // Add event listener for update button
@@ -172,29 +181,29 @@ document.getElementById("updateIndicatorInfoBtn").addEventListener("click", asyn
   const infoTextarea = document.getElementById("indicatorInfoTextarea");
   const selectedIndicator = indicatorSelect.value;
 
-  // Only proceed if we have text content and an active analysis
-  if (infoTextarea.value.trim() && analysis) {
+  // Save the current textarea content before updating
+  if (infoTextarea.value.trim()) {
+    updatedIndicatorsInformation[selectedIndicator] = infoTextarea.value;
+  }
+
+  // Only proceed if we have an active analysis
+  if (analysis) {
     elements.loadingSpinner.classList.remove("d-none");
     elements.results.innerHTML = "";
+    elements.errorAlert.classList.add("d-none"); // Hide any previous error messages
 
     try {
-      // Create a custom indicatorInformation object to send to the LLM
-      const customIndicatorInfo = {};
-      customIndicatorInfo[selectedIndicator] = infoTextarea.value;
-
-      // Update our global updatedIndicatorsInformation
-      updatedIndicatorsInformation[selectedIndicator] = infoTextarea.value;
-
       // Re-analyze with the updated indicator information
-      const results = await analyzeDocument(analysis, customIndicatorInfo);
+      const results = await analyzeDocument(analysis, updatedIndicatorsInformation);
       displayResults(results);
     } catch (error) {
+      console.error("Analysis error:", error);
       elements.errorAlert.textContent = `Error: ${error.message}`;
       elements.errorAlert.classList.remove("d-none");
     } finally {
       elements.loadingSpinner.classList.add("d-none");
     }
-  } else if (!analysis) {
+  } else {
     elements.errorAlert.textContent = "Please analyze a document first.";
     elements.errorAlert.classList.remove("d-none");
   }
@@ -231,40 +240,47 @@ async function analyzeDocument(textWithPages, customIndicatorInfo = null) {
 
       // For each custom indicator, replace or add it to the information object
       Object.keys(customIndicatorInfo).forEach((indicator) => {
-        // Parse the custom text format back into structured data
+        // Get the custom text
         const customText = customIndicatorInfo[indicator];
-        const parsedInfo = {
-          Objective: "",
-          "Focus Areas": [],
-          "Inclusion Criteria": [],
-          "Exclusion Criteria": [],
-          "Accuracy Requirements": "",
-        };
+        
+        // Check if customText is a string before trying to split it
+        if (typeof customText === 'string') {
+          const parsedInfo = {
+            Objective: "",
+            "Focus Areas": [],
+            "Inclusion Criteria": [],
+            "Exclusion Criteria": [],
+            "Accuracy Requirements": "",
+          };
 
-        // Simple parsing of the formatted text
-        const lines = customText.split("\n");
-        let currentSection = null;
+          // Simple parsing of the formatted text
+          const lines = customText.split("\n");
+          let currentSection = null;
 
-        lines.forEach((line) => {
-          if (line.startsWith("Objective:")) {
-            parsedInfo.Objective = line.replace("Objective:", "").trim();
-            currentSection = null;
-          } else if (line.startsWith("Focus Areas:")) {
-            currentSection = "Focus Areas";
-          } else if (line.startsWith("Inclusion Criteria:")) {
-            currentSection = "Inclusion Criteria";
-          } else if (line.startsWith("Exclusion Criteria:")) {
-            currentSection = "Exclusion Criteria";
-          } else if (line.startsWith("Accuracy Requirements:")) {
-            parsedInfo["Accuracy Requirements"] = line.replace("Accuracy Requirements:", "").trim();
-            currentSection = null;
-          } else if (line.trim().startsWith("- ") && currentSection) {
-            parsedInfo[currentSection].push(line.trim().substring(2));
-          }
-        });
+          lines.forEach((line) => {
+            if (line.startsWith("Objective:")) {
+              parsedInfo.Objective = line.replace("Objective:", "").trim();
+              currentSection = null;
+            } else if (line.startsWith("Focus Areas:")) {
+              currentSection = "Focus Areas";
+            } else if (line.startsWith("Inclusion Criteria:")) {
+              currentSection = "Inclusion Criteria";
+            } else if (line.startsWith("Exclusion Criteria:")) {
+              currentSection = "Exclusion Criteria";
+            } else if (line.startsWith("Accuracy Requirements:")) {
+              parsedInfo["Accuracy Requirements"] = line.replace("Accuracy Requirements:", "").trim();
+              currentSection = null;
+            } else if (line.trim().startsWith("- ") && currentSection) {
+              parsedInfo[currentSection].push(line.trim().substring(2));
+            }
+          });
 
-        // Update the indicator information
-        indicatorInfoToUse[indicator] = parsedInfo;
+          // Update the indicator information
+          indicatorInfoToUse[indicator] = parsedInfo;
+        } else {
+          // If it's not a string, just use it as is (it might already be structured data)
+          indicatorInfoToUse[indicator] = customText;
+        }
       });
     }
 
