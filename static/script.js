@@ -413,12 +413,20 @@ function parseAnalysisResults(content) {
 
 function displayResults(results) {
   elements.results.innerHTML = "";
+  
+  // Only show UI elements if we have valid results
+  if (results && results.length > 0 && results.some(result => result && Object.keys(result).length > 0)) {
+    $dropdown.classList.remove("d-none");
+    $indicatorInfoCard.classList.remove("d-none");
+  } else {
+    $dropdown.classList.add("d-none");
+    $indicatorInfoCard.classList.add("d-none");
+  }
+  
   results.forEach((result, index) => {
     if (result && Object.keys(result).length > 0) {
       const presence = result.present.toLowerCase().includes("yes");
       const confidence = parseInt(result.confidence) || 0;
-      $dropdown.classList.remove("d-none");
-      $indicatorInfoCard.classList.remove("d-none");
       const card = document.createElement("div");
       card.className = "accordion-item";
       card.innerHTML = `
