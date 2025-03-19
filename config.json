@@ -396,11 +396,24 @@
       "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
     },
     "Job-specific development training programs": {
-      "Objective": "",
-      "Focus Areas": [""],
-      "Inclusion Criteria": [""],
-      "Exclusion Criteria": [""],
-      "Accuracy Requirements": ""
+      "Objective": "Identify whether the company provides job-specific training programs for employees and determine if the training meets the criteria for 'Sector leading programs'.",
+      "Focus Areas": [
+        "Employee Development",
+        "Training and Development",
+        "Talent Management",
+        "Human Resources Section"
+      ],
+      "Inclusion Criteria": [
+        "Clear statements indicating the hours of training or amount of tuition reimbursement",
+        "For 'Sector leading programs,' evidence should clearly state if the training exceeds 40 hours per employee or the tuition reimbursement exceeds $6,000",
+        "Statements or sections that clearly describe job-specific training initiatives",
+        "If the company is from a Developed market, then the data point will be directly scored as “Yes” Developed markets List:Canada, USA, Australia, Belgium, Austria, Denmark, Finland, France, Germany, Ireland, Israel, Italy, Netherlands, Norway"
+      ],
+      "Exclusion Criteria": [
+        "References to ethics or diversity training programs unless they specify job-related training",
+        "Ambiguous statements or claims that lack specific metrics or evidence"
+      ],
+      "Accuracy Requirements": "Ensure extracted data is explicitly stated in the document. Do not infer, estimate, or assume values. Only provide officially reported figures with exact evidence text."
     }
   }
 }

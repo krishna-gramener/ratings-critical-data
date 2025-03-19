@@ -326,11 +326,11 @@ Your response must strictly follow this JSON schema:
           },
           "evidence": {
             "type": "string",
-            "description": "Direct quotes with Page Number that provide evidence for the indicator's presence."
+            "description": "**Direct quotes with Page Number** that provide evidence for the indicator's presence."
           },
           "comments": {
             "type": "string",
-            "description": "Additional context or analysis regarding the indicator."
+            "description": "Additional context or analysis regarding the indicator. Highlight references from guidelines or document."
           },
           "conclusion": {
             "type": "string",
@@ -346,7 +346,7 @@ Your response must strictly follow this JSON schema:
 }
 
 Return ONLY valid JSON that matches this schema exactly. Do not include any other text or explanation.
-You can REFER to ${JSON.stringify(indicatorInfoToUse)} to understand the indicators better`,
+REFER TO THE GUIDELINES FOR EACH INDICATOR:-  ${JSON.stringify(indicatorInfoToUse)}`,
               },
             ],
           },
