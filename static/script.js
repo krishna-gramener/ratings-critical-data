@@ -298,7 +298,8 @@ async function analyzeDocument(textWithPages, customIndicatorInfo = null) {
             parts: [
               {
                 text: `You are an ESG analysis expert. Provide detailed, evidence-based analysis in JSON format.
-Your response must strictly follow this JSON schema:
+Guidelines:-  ${JSON.stringify(indicatorInfoToUse)} \n REFER TO THE GUIDELINES FOR EACH INDICATOR
+                Your response must strictly follow this JSON schema:
 {
   "type": "object",
   "properties": {
@@ -330,7 +331,7 @@ Your response must strictly follow this JSON schema:
           },
           "comments": {
             "type": "string",
-            "description": "Additional context or analysis regarding the indicator. Highlight references from guidelines or document."
+            "description": "Additional context or analysis regarding the indicator. Give references from the guidelines provided."
           },
           "conclusion": {
             "type": "string",
@@ -346,7 +347,7 @@ Your response must strictly follow this JSON schema:
 }
 
 Return ONLY valid JSON that matches this schema exactly. Do not include any other text or explanation.
-REFER TO THE GUIDELINES FOR EACH INDICATOR:-  ${JSON.stringify(indicatorInfoToUse)}`,
+`,
               },
             ],
           },
