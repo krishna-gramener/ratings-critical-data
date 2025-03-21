@@ -298,7 +298,7 @@ async function analyzeDocument(textWithPages, customIndicatorInfo = null) {
             parts: [
               {
                 text: `You are an ESG analysis expert. Provide detailed, evidence-based analysis in JSON format.
-Guidelines:-  ${JSON.stringify(indicatorInfoToUse)} \n REFER TO THE GUIDELINES FOR EACH INDICATOR
+Guidelines:-  ${JSON.stringify(indicatorInfoToUse)} \n REFER TO THE GUIDELINES FOR EACH INDICATOR \n
                 Your response must strictly follow this JSON schema:
 {
   "type": "object",
@@ -580,27 +580,72 @@ $csvUpload.addEventListener("change", (e) => {
     return;
   }
 
-  // Add validation to check if it's a CSV file
-  if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
-    console.error("Please select a valid CSV file");
-    return;
-  }
+  // Check file type and process accordingly
+  if (file.type === "text/csv" || file.name.endsWith(".csv")) {
+    // Process CSV file
+    const reader = new FileReader();
 
-  const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      processCSVData(text);
+    };
 
-  reader.onload = (e) => {
-    const text = e.target.result;
-    processCSVData(text);
-  };
+    reader.onerror = (error) => {
+      console.error("Error reading file:", error);
+    };
 
-  reader.onerror = (error) => {
-    console.error("Error reading file:", error);
-  };
+    try {
+      reader.readAsText(file);
+    } catch (error) {
+      console.error("Error reading file:", error);
+    }
+  } else if (
+    file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    file.name.endsWith(".xlsx")
+  ) {
+    // Process XLSX file
+    const reader = new FileReader();
 
-  try {
-    reader.readAsText(file);
-  } catch (error) {
-    console.error("Error reading file:", error);
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        
+        // Look for "sample data" sheet
+        const sheetName = workbook.SheetNames.find(
+          name => name.toLowerCase() === "sample data"
+        );
+        
+        if (!sheetName) {
+          alert("XLSX file must contain a 'sample data' sheet");
+          return;
+        }
+        
+        // Get the worksheet
+        const worksheet = workbook.Sheets[sheetName];
+        
+        // Convert to JSON
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        
+        // Process the data similar to CSV
+        processXLSXData(jsonData);
+      } catch (error) {
+        console.error("Error processing XLSX file:", error);
+        alert("Error processing XLSX file: " + error.message);
+      }
+    };
+
+    reader.onerror = (error) => {
+      console.error("Error reading file:", error);
+    };
+
+    try {
+      reader.readAsArrayBuffer(file);
+    } catch (error) {
+      console.error("Error reading file:", error);
+    }
+  } else {
+    alert("Please select a valid CSV or XLSX file");
   }
 });
 
@@ -678,6 +723,55 @@ function processCSVData(csvText) {
 
   // Filter CSV data for current PDF
   const relevantData = csvData.filter((row) => row.name === currentPDF);
+
+  // Compare with LLM outputs
+  const results = compareWithLLMOutput(relevantData);
+
+  // Display results
+  displayAccuracyResults(results);
+}
+
+function processXLSXData(jsonData) {
+  // Validate required columns
+  if (jsonData.length === 0) {
+    alert("No data found in the XLSX file");
+    return;
+  }
+  
+  // Check for required columns (case-insensitive)
+  const firstRow = jsonData[0];
+  const headers = Object.keys(firstRow).map(h => h.toLowerCase().trim());
+  
+  // Find required column indices
+  const nameColumn = Object.keys(firstRow).find(
+    key => key.toLowerCase().trim() === "name"
+  );
+  const dpNameColumn = Object.keys(firstRow).find(
+    key => key.toLowerCase().trim() === "dp name"
+  );
+  const correctAnswerColumn = Object.keys(firstRow).find(
+    key => key.toLowerCase().trim() === "correct answer"
+  );
+
+  if (!nameColumn || !dpNameColumn || !correctAnswerColumn) {
+    alert("Required columns not found in XLSX. Please ensure the file has 'Name', 'DP Name' and 'Correct Answer' columns.");
+    return;
+  }
+
+  // Convert to array of objects with required fields
+  const xlsxData = jsonData
+    .map((row) => ({
+      name: row[nameColumn]?.toString().trim().toLowerCase(),
+      dpName: row[dpNameColumn]?.toString().trim().toLowerCase(),
+      correctAnswer: row[correctAnswerColumn]?.toString().trim().toLowerCase(),
+    }))
+    .filter((row) => row.name && row.dpName && row.correctAnswer);
+
+  // Get the current PDF name from the dropdown
+  const currentPDF = pdfName.trim().toLowerCase();
+
+  // Filter data for current PDF
+  const relevantData = xlsxData.filter((row) => row.name === currentPDF);
 
   // Compare with LLM outputs
   const results = compareWithLLMOutput(relevantData);
