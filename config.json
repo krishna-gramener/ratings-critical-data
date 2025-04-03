@@ -1,126 +1,180 @@
 {
   "indicators": {
-    "Employee Turnover": [
-      "Overall assessment as Above industry average, increasing trend",
-      "On par with industry average;On par with industry average, increasing trend",
-      "On par with industry average, decreasing trend",
-      "Below industry average, decreasing trend",
-      "Not Reported"
-    ],
-    "Formal Talent Pipeline Development Strategy": ["Yes", "No", "Not Reported"],
-    "Involvement in Developing or Distributing Hybrid or Electric Vehicles": [
-      "No Value",
-      "Pure play (revenues >50%)",
-      "Core business (revenues 20-50%)",
-      "Non-core involvement (revenues <20%)",
-      "R&D underway / exploring opportunities",
-      "Not Reported"
-    ],
-    "Involvement in Developing or Distributing LED Lighting": [
-      "No Value",
-      "Pure play (revenues >50%)",
-      "Core business (revenues 20-50%)",
-      "Non-core involvement (revenues <20%)",
-      "R&D underway / exploring opportunities",
-      "Not Reported"
-    ],
-    "Involvement in Generation or Development of Solar Power Capacity": [
-      "No Value",
-      "Pure play (revenues >50%)",
-      "Core business (revenues 20-50%)",
-      "Non-core involvement (revenues <20%)",
-      "R&D underway / exploring opportunities",
-      "Not Reported"
-    ],
-    "Involvement in Production or Distribution of Batteries": [
-      "No Value",
-      "Pure play (revenues >50%)",
-      "Core business (revenues 20-50%)",
-      "Non-core involvement (revenues <20%)",
-      "R&D underway / exploring opportunities",
-      "Not Reported"
-    ],
-    "Involvement in Production or Distribution of Industrial Automation Technologies": [
-      "No Value",
-      "Pure play (revenues >50%)",
-      "Core business (revenues 20-50%)",
-      "Non-core involvement (revenues <20%)",
-      "R&D underway / exploring opportunities",
-      "Not Reported"
-    ],
-    "Privacy Enhancing Technologies and Initiatives": [
-      "Data protection safeguards integrated into product & service development",
-      "Initiatives developed to protect and empower customers/users",
-      "Basic education towards customers/users on how to protect themselves online",
-      "Not Reported"
-    ],
-    "Innovation in Other Alternative Branchless Distribution Channels": [
-      "Sector leading innovation in alternative branchless distribution channels targeting underserveddemographics",
-      "Innovation in alternative branchless distribution channels targeting underserved demographics",
-      "Alternative branchless distribution channels with some focus on targeting underserved demographics",
-      "Evidence of alternative branchless distribution channels but no information on distributiontargeting underserved demographics",
-      "Limited or no evidence of alternative branchless distribution channels"
-    ],
-    "Extent of Supply Chain Initiatives to Address Impacts of Timber and/or Paper Production": [
-      "Requires all suppliers to produce or purchase sustainable timber/paper and verifies compliance",
-      "In process of implementing sustainable timber purchasing requirements at core suppliers",
-      "Has pilot projects on EITHER reducing environmental impact of pulp processing OR purchasing timber from identified sustainable and legal sources",
-      "Educates suppliers on responsible timber/paper sourcing and production",
-      "General Statement",
-      "Not Reported"
-    ],
-    "Achievements on Packaging Content": [
-      "Achievements have broad scope (company-wide or across all relevant packaging)",
-      "There is evidence of improvement",
-      "Achievements apply to individual product or package lines only",
-      "General statement",
-      "Not Reported"
-    ],
-    "SME Business - Assessment": [
-      "Global leader on SME finance (over 40% of total lending)",
-      "Above-average level of SME finance",
-      "Average level of SME finance",
-      "Below-average level of SME finance",
-      "Limited evidence of SME finance",
-      "Not reported"
-    ],
-    "Programs to increase workforce diversity": [
-      "Provides material benefits to facilitate diversity and inclusion, and sets quantitative diversity targets in recruitment process",
-      "Provides material benefits to facilitate diversity and inclusion",
-      "Quantitative diversity targets in recruitment process",
-      "General statements on plans to improve diversity in workforce",
-      "No evidence"
-    ],
-    "Workforce eligible for non-pay benefits": [
-      "Benefits cover all employees",
-      "Benefits cover selected employees",
-      "Scope not determinable",
-      "Minimum practices expected based on domestic industry norms",
-      "No evidence"
-    ],
-    "Workforce diversity policy and management oversight": [
-      "Employee training on diversity policy, supported by senior executive or higher level of oversight on diversity performance",
-      "Senior executive or higher level of oversight on diversity performance",
-      "Employee training on diversity policy",
-      "General statements on diversity and equal opportunity",
-      "No evidence"
-    ],
-    "Data Breach/ Incident Response Plan": [
-      "Both proactive and reactive measures are in place",
-      "Proactive measures are in place",
-      "Reactive measures are in place",
-      "General statements on data breach/ incident response plan",
-      "Minimum practices expected based on domestic industry norms",
-      "No evidence"
-    ],
-    "Managerial and leadership development training": [
-      "Comprehensive succession planning & development programs at multiple levels",
-      "Programs focusing on internal upward mobility through training and development",
-      "General statements on leadership training with unknown scope or achieved results",
-      "Minimum practices expected based on domestic industry norms",
-      "No evidence"
-    ],
-    "Job-specific development training programs": ["Sector leading programs", "Yes", "No", "Not disclosed"]
+    "Employee Turnover": {
+      "id": 1174,
+      "values": [
+        "Overall assessment as Above industry average, increasing trend",
+        "On par with industry average;On par with industry average, increasing trend",
+        "On par with industry average, decreasing trend",
+        "Below industry average, decreasing trend",
+        "Not Reported"
+      ]
+    },
+    "Formal Talent Pipeline Development Strategy": {
+      "id": 498,
+      "values": ["Yes", "No", "Not Reported"]
+    },
+    "Involvement in Developing or Distributing Hybrid or Electric Vehicles": {
+      "id": 1224,
+      "values": [
+        "No Value",
+        "Pure play (revenues >50%)",
+        "Core business (revenues 20-50%)",
+        "Non-core involvement (revenues <20%)",
+        "R&D underway / exploring opportunities",
+        "Not Reported"
+      ]
+    },
+    "Involvement in Developing or Distributing LED Lighting": {
+      "id": 1217,
+      "values": [
+        "No Value",
+        "Pure play (revenues >50%)",
+        "Core business (revenues 20-50%)",
+        "Non-core involvement (revenues <20%)",
+        "R&D underway / exploring opportunities",
+        "Not Reported"
+      ]
+    },
+    "Involvement in Generation or Development of Solar Power Capacity": {
+      "id": 1229,
+      "values": [
+        "No Value",
+        "Pure play (revenues >50%)",
+        "Core business (revenues 20-50%)",
+        "Non-core involvement (revenues <20%)",
+        "R&D underway / exploring opportunities",
+        "Not Reported"
+      ]
+    },
+    "Involvement in Production or Distribution of Batteries": {
+      "id": 1252,
+      "values": [
+        "No Value",
+        "Pure play (revenues >50%)",
+        "Core business (revenues 20-50%)",
+        "Non-core involvement (revenues <20%)",
+        "R&D underway / exploring opportunities",
+        "Not Reported"
+      ]
+    },
+    "Involvement in Production or Distribution of Industrial Automation Technologies": {
+      "id": 1242,
+      "values": [
+        "No Value",
+        "Pure play (revenues >50%)",
+        "Core business (revenues 20-50%)",
+        "Non-core involvement (revenues <20%)",
+        "R&D underway / exploring opportunities",
+        "Not Reported"
+      ]
+    },
+    "Privacy Enhancing Technologies and Initiatives": {
+      "id": 1338,
+      "values": [
+        "Data protection safeguards integrated into product & service development",
+        "Initiatives developed to protect and empower customers/users",
+        "Basic education towards customers/users on how to protect themselves online",
+        "Not Reported"
+      ]
+    },
+    "Innovation in Other Alternative Branchless Distribution Channels": {
+      "id": 535,
+      "values": [
+        "Sector leading innovation in alternative branchless distribution channels targeting underserveddemographics",
+        "Innovation in alternative branchless distribution channels targeting underserved demographics",
+        "Alternative branchless distribution channels with some focus on targeting underserved demographics",
+        "Evidence of alternative branchless distribution channels but no information on distributiontargeting underserved demographics",
+        "Limited or no evidence of alternative branchless distribution channels"
+      ]
+    },
+    "Extent of Supply Chain Initiatives to Address Impacts of Timber and/or Paper Production": {
+      "id": 486,
+      "values": [
+        "Requires all suppliers to produce or purchase sustainable timber/paper and verifies compliance",
+        "In process of implementing sustainable timber purchasing requirements at core suppliers",
+        "Has pilot projects on EITHER reducing environmental impact of pulp processing OR purchasing timber from identified sustainable and legal sources",
+        "Educates suppliers on responsible timber/paper sourcing and production",
+        "General Statement",
+        "Not Reported"
+      ]
+    },
+    "Achievements on Packaging Content": {
+      "id": 1326,
+      "values": [
+        "Achievements have broad scope (company-wide or across all relevant packaging)",
+        "There is evidence of improvement",
+        "Achievements apply to individual product or package lines only",
+        "General statement",
+        "Not Reported"
+      ]
+    },
+    "SME Business - Assessment": {
+      "id": 700,
+      "values": [
+        "Global leader on SME finance (over 40% of total lending)",
+        "Above-average level of SME finance",
+        "Average level of SME finance",
+        "Below-average level of SME finance",
+        "Limited evidence of SME finance",
+        "Not reported"
+      ]
+    },
+    "Programs to increase workforce diversity": {
+      "id": 651,
+      "values": [
+        "Provides material benefits to facilitate diversity and inclusion, and sets quantitative diversity targets in recruitment process",
+        "Provides material benefits to facilitate diversity and inclusion",
+        "Quantitative diversity targets in recruitment process",
+        "General statements on plans to improve diversity in workforce",
+        "No evidence"
+      ]
+    },
+    "Workforce eligible for non-pay benefits": {
+      "id": 759,
+      "values": [
+        "Benefits cover all employees",
+        "Benefits cover selected employees",
+        "Scope not determinable",
+        "Minimum practices expected based on domestic industry norms",
+        "No evidence"
+      ]
+    },
+    "Workforce diversity policy and management oversight": {
+      "id": 758,
+      "values": [
+        "Employee training on diversity policy, supported by senior executive or higher level of oversight on diversity performance",
+        "Senior executive or higher level of oversight on diversity performance",
+        "Employee training on diversity policy",
+        "General statements on diversity and equal opportunity",
+        "No evidence"
+      ]
+    },
+    "Data Breach/ Incident Response Plan": {
+      "id": 382,
+      "values": [
+        "Both proactive and reactive measures are in place",
+        "Proactive measures are in place",
+        "Reactive measures are in place",
+        "General statements on data breach/ incident response plan",
+        "Minimum practices expected based on domestic industry norms",
+        "No evidence"
+      ]
+    },
+    "Managerial and leadership development training": {
+      "id": 583,
+      "values": [
+        "Comprehensive succession planning & development programs at multiple levels",
+        "Programs focusing on internal upward mobility through training and development",
+        "General statements on leadership training with unknown scope or achieved results",
+        "Minimum practices expected based on domestic industry norms",
+        "No evidence"
+      ]
+    },
+    "Job-specific development training programs": {
+      "id": 1172,
+      "values": ["Sector leading programs", "Yes", "No", "Not disclosed"]
+    }
   },
   "indicatorsInformation": {
     "Employee Turnover": {

@@ -64,7 +64,7 @@ label2.textContent = "View Value";
 function updateValueDropdown() {
   const selectedIndicator = indicatorSelect.value;
   valueSelect.innerHTML = "";
-  indicators[selectedIndicator].forEach((value) => {
+  indicators[selectedIndicator].values.forEach((value) => {
     const option = document.createElement("option");
     option.value = value;
     option.textContent = value;
@@ -605,7 +605,6 @@ $csvUpload.addEventListener("change", (e) => {
   ) {
     // Process XLSX file
     const reader = new FileReader();
-
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result);
@@ -613,11 +612,11 @@ $csvUpload.addEventListener("change", (e) => {
         
         // Look for "sample data" sheet
         const sheetName = workbook.SheetNames.find(
-          name => name.toLowerCase() === "sample data"
+          name => name.toLowerCase() === "sample data" || name.toLowerCase() === "sample"
         );
         
         if (!sheetName) {
-          alert("XLSX file must contain a 'sample data' sheet");
+          alert("XLSX file must contain a 'sample data' or 'sample' sheet");
           return;
         }
         
@@ -743,35 +742,78 @@ function processXLSXData(jsonData) {
   const headers = Object.keys(firstRow).map(h => h.toLowerCase().trim());
   
   // Find required column indices
-  const nameColumn = Object.keys(firstRow).find(
-    key => key.toLowerCase().trim() === "name"
+  const sourceExtractionColumn = Object.keys(firstRow).find(
+    key => key.toLowerCase().trim() === "source_extraction"
   );
-  const dpNameColumn = Object.keys(firstRow).find(
-    key => key.toLowerCase().trim() === "dp name"
+  const extractionValueColumn = Object.keys(firstRow).find(
+    key => key.toLowerCase().trim() === "extraction_value"
   );
-  const correctAnswerColumn = Object.keys(firstRow).find(
-    key => key.toLowerCase().trim() === "correct answer"
+  const extractionColumn = Object.keys(firstRow).find(
+    key => key.toLowerCase().trim() === "extraction"
   );
 
-  if (!nameColumn || !dpNameColumn || !correctAnswerColumn) {
-    alert("Required columns not found in XLSX. Please ensure the file has 'Name', 'DP Name' and 'Correct Answer' columns.");
+  const dpIdColumn = Object.keys(firstRow).find(
+    key => key.toLowerCase().trim() === "dp_id"
+  );
+
+  // Check for required columns
+  if (!sourceExtractionColumn || !extractionValueColumn || !dpIdColumn) {
+    alert("Required columns not found in XLSX. Please ensure the file has 'source_extraction', 'extraction_value', and 'dp_id' columns.");
     return;
   }
 
+  // Helper function to extract PDF name from URL
+  const extractPdfNameFromUrl = (url) => {
+    if (!url) return "";
+    // Extract the part after the last '/'
+    const parts = url.split('/');
+    // Replace % with spaces and decode URL
+    return decodeURIComponent(parts[parts.length - 1]).replace(/%/g, ' ').trim().toLowerCase();
+  };
+
   // Convert to array of objects with required fields
   const xlsxData = jsonData
-    .map((row) => ({
-      name: row[nameColumn]?.toString().trim().toLowerCase(),
-      dpName: row[dpNameColumn]?.toString().trim().toLowerCase(),
-      correctAnswer: row[correctAnswerColumn]?.toString().trim().toLowerCase(),
-    }))
-    .filter((row) => row.name && row.dpName && row.correctAnswer);
+    .map((row) => {
+      // Extract PDF name from source_extraction URL
+      if (!row[sourceExtractionColumn]) {
+        return null; // Skip rows without a valid source_extraction
+      }
+      
+      const pdfName = extractPdfNameFromUrl(row[sourceExtractionColumn]);
+      // Check if extraction column exists and has one of the required values
+      const extractionValue = row[extractionColumn]?.toString().trim().toLowerCase();
+      const isValidExtraction = extractionColumn && 
+        ["correct", "matched-value", "matched-no value"].includes(extractionValue);
+      
+      if (!isValidExtraction) {
+        return null; // Skip rows with invalid extraction values
+      }
+      
+      // Get the DP ID from the row
+      const dpId = row[dpIdColumn] ? parseInt(row[dpIdColumn], 10) : null;
+      if (!dpId) {
+        return null; // Skip rows without a valid DP ID
+      }
+      
+      return {
+        name: pdfName,
+        correctAnswer: row[extractionValueColumn]?.toString().trim(),
+        dpId: dpId,
+        extraction: extractionValue
+      };
+    })
+    .filter((row) => row && row.name && row.correctAnswer && row.dpId);
 
   // Get the current PDF name from the dropdown
   const currentPDF = pdfName.trim().toLowerCase();
 
   // Filter data for current PDF
   const relevantData = xlsxData.filter((row) => row.name === currentPDF);
+
+  if (relevantData.length === 0) {
+    alert(`No matching data found for the current PDF: ${currentPDF}`);
+    return;
+  }
 
   // Compare with LLM outputs
   const results = compareWithLLMOutput(relevantData);
@@ -780,81 +822,103 @@ function processXLSXData(jsonData) {
   displayAccuracyResults(results);
 }
 
-function compareWithLLMOutput(csvData) {
+function compareWithLLMOutput(excelData) {
   const matches = [];
   let correctCount = 0;
-  const totalIndicators = Object.keys(indicators).length;
-  // Function to normalize string (lowercase, trim, replace multiple spaces)
-  const normalizeString = (str) => {
-    return str?.toLowerCase().trim().replace(/\s+/g, " ") || "";
-  };
+  let totalComparisons = 0;
+  
+  // Helper function to normalize strings
+  const normalizeString = str => str?.toLowerCase().trim().replace(/\s+/g, " ") || "";
 
-  // Compare each indicator with CSV data
-  for (const indicator of Object.keys(indicators)) {
-    // Find matching analysis object for this indicator
-    const analysisEntry = llmResponseArray.find((item) => item.indicator === indicator);
-    const llmConclusion = normalizeString(analysisEntry?.conclusion);
+  // Create maps for quick lookups
+  const processedIndicators = new Set();
+  const indicatorMap = {};
+  
+  // Build indicator ID mapping
+  Object.entries(indicators).forEach(([name, data]) => {
+    indicatorMap[data.id] = name;
+  });
 
-    // Find matching CSV entry using find method
-    const csvEntry = csvData.find((row) => row.dpName.toLowerCase() === indicator.toLowerCase());
-    const csvConclusion = normalizeString(csvEntry?.correctAnswer);
-
-    if (!csvConclusion) {
-      correctCount++;
-      matches.push({
-        indicator,
-        llmOutput: analysisEntry?.conclusion || "N/A",
-        csvOutput: "Not present in CSV",
-        isCorrect: true,
-      });
-      continue;
+  // Process Excel data rows
+  excelData.forEach(row => {
+    const indicatorName = indicatorMap[row.dpId];
+    if (!indicatorName) {
+      console.warn(`No indicator found for DP ID: ${row.dpId}`);
+      return;
     }
 
-    // Compare normalized strings
-    const isCorrect = llmConclusion === csvConclusion;
+    processedIndicators.add(indicatorName);
+    totalComparisons++;
+    
+    const analysisEntry = llmResponseArray.find(item => item.indicator === indicatorName);
+    const isCorrect = normalizeString(analysisEntry?.conclusion) === normalizeString(row.correctAnswer);
+    
     if (isCorrect) correctCount++;
 
     matches.push({
-      indicator,
+      indicator: indicatorName,
+      dpId: row.dpId,
       llmOutput: analysisEntry?.conclusion || "N/A",
-      csvOutput: csvEntry?.correctAnswer || "N/A",
-      isCorrect,
+      csvOutput: row.correctAnswer || "N/A",
+      extraction: row.extraction,
+      isCorrect
     });
-  }
+  });
 
-  const accuracy = (correctCount / totalIndicators) * 100;
+  // Add missing indicators
+  Object.entries(indicators).forEach(([name, data]) => {
+    if (!processedIndicators.has(name)) {
+      totalComparisons++;
+      correctCount++; // Mark as correct per requirement
+      
+      const analysisEntry = llmResponseArray.find(item => item.indicator === name);
+      matches.push({
+        indicator: name,
+        dpId: data.id,
+        llmOutput: analysisEntry?.conclusion || "N/A",
+        csvOutput: "Not present in golden set",
+        extraction: "N/A",
+        isCorrect: true
+      });
+    }
+  });
 
-  // Display results in table format
+  // Calculate accuracy
+  const accuracy = totalComparisons > 0 ? (correctCount / totalComparisons) * 100 : 0;
+
+  // Build results HTML
   const resultsDiv = document.getElementById("goldenSetResults");
-
   let html = `
     <div class="card">
       <div class="card-body">
         <h4 class="card-title ${accuracy >= 80 ? "text-success" : accuracy >= 40 ? "text-warning" : "text-danger"}">
           Accuracy: ${accuracy.toFixed(2)}%
         </h4>
-        <p class="card-text">Correct matches: ${correctCount}/${totalIndicators}</p>
-        
+        <p class="card-text">Correct matches: ${correctCount}/${totalComparisons}</p>
         <div class="table-responsive mt-3">
           <table class="table table-bordered">
             <thead class="table-light">
               <tr>
                 <th>Indicator</th>
+                <th>DP ID</th>
                 <th>LLM Conclusion</th>
                 <th>Golden Set Answer</th>
-                <th>Status</th>
+                <th>Extraction Status</th>
+                <th>Match Status</th>
               </tr>
             </thead>
             <tbody>
   `;
 
-  // Add rows for each comparison
-  matches.forEach((match) => {
+  // Add table rows
+  matches.forEach(match => {
     html += `
       <tr>
         <td>${match.indicator}</td>
+        <td>${match.dpId}</td>
         <td>${match.llmOutput}</td>
         <td>${match.csvOutput}</td>
+        <td>${match.extraction}</td>
         <td class="${match.isCorrect ? "text-success" : "text-danger"}">
           ${match.isCorrect ? "✓ Correct" : "✗ Incorrect"}
         </td>
@@ -876,7 +940,7 @@ function compareWithLLMOutput(csvData) {
     matches,
     accuracy,
     correctCount,
-    total: totalIndicators,
+    total: totalComparisons
   };
 }
 
