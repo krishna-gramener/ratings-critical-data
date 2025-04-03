@@ -6,6 +6,7 @@ const $dropdown = document.getElementById("dropdown");
 const $goldenSetDiv = document.getElementById("goldenSetDiv");
 const $csvUpload = document.getElementById("csvUpload");
 const $indicatorInfoCard = document.getElementById("indicatorInfoCard");
+const $resultsDiv = document.getElementById("goldenSetResults");
 const elements = {
   urlInput: document.getElementById("urlInput"),
   fileInput: document.getElementById("fileInput"),
@@ -573,6 +574,9 @@ elements.fileInput.addEventListener("change", async (e) => {
 });
 
 $csvUpload.addEventListener("change", (e) => {
+  
+  $resultsDiv.innerHTML = `<div class="spinner-border text-primary" role="status">
+</div>`;
   const file = e.target.files[0];
   // Add validation to check if file exists
   if (!file) {
@@ -725,9 +729,6 @@ function processCSVData(csvText) {
 
   // Compare with LLM outputs
   const results = compareWithLLMOutput(relevantData);
-
-  // Display results
-  displayAccuracyResults(results);
 }
 
 function processXLSXData(jsonData) {
@@ -818,11 +819,14 @@ function processXLSXData(jsonData) {
   // Compare with LLM outputs
   const results = compareWithLLMOutput(relevantData);
 
-  // Display results
-  displayAccuracyResults(results);
 }
 
 function compareWithLLMOutput(excelData) {
+  if (!llmResponseArray || llmResponseArray.length === 0) {
+    alert("No analysis results available. Please analyze a document first.");
+    return;
+  }
+  
   const matches = [];
   let correctCount = 0;
   let totalComparisons = 0;
@@ -887,7 +891,6 @@ function compareWithLLMOutput(excelData) {
   const accuracy = totalComparisons > 0 ? (correctCount / totalComparisons) * 100 : 0;
 
   // Build results HTML
-  const resultsDiv = document.getElementById("goldenSetResults");
   let html = `
     <div class="card">
       <div class="card-body">
@@ -897,13 +900,12 @@ function compareWithLLMOutput(excelData) {
         <p class="card-text">Correct matches: ${correctCount}/${totalComparisons}</p>
         <div class="table-responsive mt-3">
           <table class="table table-bordered">
-            <thead class="table-light">
+            <thead>
               <tr>
                 <th>Indicator</th>
                 <th>DP ID</th>
                 <th>LLM Conclusion</th>
                 <th>Golden Set Answer</th>
-                <th>Extraction Status</th>
                 <th>Match Status</th>
               </tr>
             </thead>
@@ -918,7 +920,6 @@ function compareWithLLMOutput(excelData) {
         <td>${match.dpId}</td>
         <td>${match.llmOutput}</td>
         <td>${match.csvOutput}</td>
-        <td>${match.extraction}</td>
         <td class="${match.isCorrect ? "text-success" : "text-danger"}">
           ${match.isCorrect ? "✓ Correct" : "✗ Incorrect"}
         </td>
@@ -934,7 +935,7 @@ function compareWithLLMOutput(excelData) {
     </div>
   `;
 
-  resultsDiv.innerHTML = html;
+  $resultsDiv.innerHTML = html;
 
   return {
     matches,
@@ -942,53 +943,4 @@ function compareWithLLMOutput(excelData) {
     correctCount,
     total: totalComparisons
   };
-}
-
-function displayAccuracyResults(results) {
-  const resultsDiv = document.getElementById("goldenSetResults");
-
-  // Determine color based on accuracy
-  let colorClass;
-  if (results.accuracy >= 80) {
-    colorClass = "text-success";
-  } else if (results.accuracy >= 40) {
-    colorClass = "text-warning";
-  } else {
-    colorClass = "text-danger";
-  }
-
-  // Create results HTML
-  let html = `
-      <h4 class="${colorClass}">Accuracy: ${results.accuracy.toFixed(2)}%</h4>
-      <p>Correct matches: ${results.correctCount}/${results.total}</p>
-      <div class="mt-3">
-          <h5>Detailed Results:</h5>
-          <div class="table-responsive">
-              <table class="table table-bordered">
-                  <thead>
-                      <tr>
-                          <th>Indicator</th>
-                          <th>LLM Output</th>
-                          <th>Golden Set Answer</th>
-                          <th>Status</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-  `;
-
-  // Add rows for each comparison
-  results.matches.forEach((match) => {
-    html += `
-          <tr>
-              <td>${match.indicator}</td>
-              <td>${match.llmOutput}</td>
-              <td>${match.csvOutput}</td>
-              <td class="${match.isCorrect ? "text-success" : "text-danger"}">
-                  ${match.isCorrect ? "✓ Correct" : "✗ Incorrect"}
-              </td>
-          </tr>
-      `;
-  });
-
-  resultsDiv.innerHTML = html;
 }
